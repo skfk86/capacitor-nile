@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Signed Android Release
 on:
   push:
     branches: [main]
@@ -7,6 +7,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: signed-build
+  cancel-in-progress: false
 
 jobs:
   check:
@@ -19,6 +23,14 @@ jobs:
           grep -q viewport www/index.html
           node -e "JSON.parse(require('fs').readFileSync('package.json'))"
           node -e "JSON.parse(require('fs').readFileSync('capacitor.config.json'))"
+      - name: Check KS_PASS secret
+        env:
+          KS_PASS: ${{ secrets.KS_PASS }}
+        run: |
+          if [ ${#KS_PASS} -lt 16 ]; then
+            echo "::error::Add a repository secret named KS_PASS with at least 16 characters"
+            exit 1
+          fi
 
   build:
     needs: check
@@ -40,6 +52,29 @@ jobs:
             ~/.gradle/wrapper
           key: deps-${{ hashFiles('package.json') }}
           restore-keys: deps-
+
+      - name: Prepare signing key
+        env:
+          KS_PASS: ${{ secrets.KS_PASS }}
+        run: |
+          if [ ! -f signing/release.jks.enc ]; then
+            keytool -genkeypair -keystore release.jks -storetype PKCS12 \
+              -alias nile -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$KS_PASS" -keypass "$KS_PASS" \
+              -dname "CN=Capacitor Nile, O=Nile, C=SD"
+            mkdir -p signing
+            openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt \
+              -pass env:KS_PASS -in release.jks -out signing/release.jks.enc
+            git config user.name "github-actions"
+            git config user.email "actions@users.noreply.github.com"
+            git add signing/release.jks.enc
+            git commit -m "add encrypted signing key"
+            git push origin HEAD:main
+          else
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
+              -pass env:KS_PASS -in signing/release.jks.enc -out release.jks
+          fi
+
       - name: Install dependencies
         run: npm install
       - name: Add Android platform
@@ -57,17 +92,41 @@ jobs:
           npx capacitor-assets generate --android
       - name: Sync web files
         run: npx cap sync android
-      - name: Build APK
+
+      - name: Build release
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleRelease bundleRelease
+
+      - name: Sign APK and AAB
+        env:
+          KS_PASS: ${{ secrets.KS_PASS }}
+        run: |
+          BT=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)
+          OUT=android/app/build/outputs
+          $BT/zipalign -p 4 $OUT/apk/release/app-release-unsigned.apk aligned.apk
+          $BT/apksigner sign --ks release.jks --ks-key-alias nile \
+            --ks-pass env:KS_PASS --key-pass env:KS_PASS \
+            --out nile-release.apk aligned.apk
+          $BT/apksigner verify nile-release.apk
+          cp $OUT/bundle/release/app-release.aab nile-release.aab
+          jarsigner -sigalg SHA256withRSA -digestalg SHA-256 \
+            -keystore release.jks -storepass "$KS_PASS" -keypass "$KS_PASS" \
+            nile-release.aab nile
+          rm -f release.jks aligned.apk
+
       - uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: release-signed
+          path: |
+            nile-release.apk
+            nile-release.aab
+
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+          files: |
+            nile-release.apk
+            nile-release.aab
