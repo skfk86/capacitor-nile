@@ -204,6 +204,7 @@ button,a{touch-action:manipulation}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]) .go,:root:not([data-theme=light]) .seg .on,:root:not([data-theme=light]) .hd .ti{color:#04181c}}
 .pb small,.go2{color:color-mix(in srgb,var(--a) 60%,var(--ink))}
 .hero p{color:#eaf7f7}
+.adb{padding-bottom:calc(150px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)))}
 </style>
 </head>
 <body>
@@ -236,6 +237,7 @@ button,a{touch-action:manipulation}
 <div class="sc" id="sc"></div>
 <aside class="dr" id="dr"></aside>
 
+<script src="ads-config.js"></script>
 <script>
 const IC={
 phone:'<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
@@ -1074,10 +1076,10 @@ function open(i){
   lv.scrollTop=0;lv.classList.add('on');ovOn();
 }
 let ovT=0;
-function ovOn(){document.body.classList.add('ov');clearTimeout(ovT);ovT=setTimeout(()=>document.body.classList.add('ovh'),380)}
+function ovOn(){adsBanner(false);document.body.classList.add('ov');clearTimeout(ovT);ovT=setTimeout(()=>document.body.classList.add('ovh'),380)}
 function ctaUpd(){const i=L.findIndex((_,k)=>!done.includes(k));$('#cta').innerHTML=(done.length===0?'ابدأ الرحلة':i<0?'استلم شهادتك':'تابع من المحطة '+(i+1))+ic('next',18)}
 function refresh(){const k=[...document.querySelectorAll('.tab')].findIndex(e=>e.classList.contains('on'));[home,stats,paths,settings][k]();ctaUpd()}
-function close(){$('#lv').classList.remove('on');$('#sh').classList.remove('on');clearTimeout(ovT);document.body.classList.remove('ov','ovh');setTimeout(refresh,380)}
+function close(){$('#lv').classList.remove('on');$('#sh').classList.remove('on');clearTimeout(ovT);document.body.classList.remove('ov','ovh');setTimeout(()=>{refresh();adsBanner(true)},380)}
 function copy(t,btn){
   const o=btn.innerHTML;
   const ok=()=>{S.copies++;sv();btn.innerHTML=ic('check',15)+' تم النسخ';setTimeout(()=>btn.innerHTML=o,1500)};
@@ -1093,7 +1095,7 @@ $('#lv').addEventListener('click',e=>{
   const c=e.target.closest('.cp');
   if(c)return copy(c.parentNode.nextElementSibling.textContent,c);
   if(e.target.closest('.go')){
-    if(!done.includes(cur)){done.push(cur);bump()}save();
+    if(!done.includes(cur)){done.push(cur);bump();adsAfterLesson()}save();
     if(cur<L.length-1)open(cur+1);else{history.back();if(done.length===L.length)setTimeout(pgCert,380)}
   }
 });
@@ -1204,6 +1206,44 @@ async function shareCert(){
     try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'شهادة Capacitor Nile'});return}}catch(e){if(e&&e.name==='AbortError')return}
     const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove()});
 }
+const ADS=Object.assign({banner:'ca-app-pub-3940256099942544/6300978111',inter:'ca-app-pub-3940256099942544/1033173712',test:true},window.ADS||{});
+const adP=()=>{const C=window.Capacitor;return C&&C.isNativePlatform&&C.isNativePlatform()&&C.Plugins&&C.Plugins.AdMob||null};
+const BANNER_ENABLED=false; // AdMob policy: no banner next to the bottom navigation bar
+const ad={ok:false,priv:false,on:false,want:false,q:Promise.resolve()};
+async function adsInit(){
+  const A=adP();if(!A)return;
+  try{
+    await A.initialize({initializeForTesting:ADS.test,tagForChildDirectedTreatment:false,tagForUnderAgeOfConsent:false});
+    let i=await A.requestConsentInfo();
+    if(i&&i.isConsentFormAvailable&&i.status==='REQUIRED')i=await A.showConsentForm();
+    ad.priv=!!(i&&i.privacyOptionsRequirementStatus==='REQUIRED');
+    ad.ok=!i||i.canRequestAds!==false;
+    if(ad.ok)adPre();
+    settings();
+  }catch(e){}
+}
+function adsBanner(on){
+  if(!BANNER_ENABLED)return;
+  ad.want=on;
+  ad.q=ad.q.then(async()=>{
+    const A=adP();if(!A||!ad.ok||ad.on===ad.want)return;const w=ad.want;
+    try{
+      if(w)await A.showBanner({adId:ADS.banner,adSize:'ADAPTIVE_BANNER',position:'BOTTOM_CENTER',margin:Math.round($('#nav').offsetHeight),isTesting:ADS.test});
+      else await A.removeBanner();
+      ad.on=w;document.body.classList.toggle('adb',w);
+    }catch(e){}
+  });
+}
+async function adPre(){const A=adP();if(!A||!ad.ok)return;try{await A.prepareInterstitial({adId:ADS.inter,isTesting:ADS.test})}catch(e){}}
+async function adsAfterLesson(){
+  S.adn=(S.adn||0)+1;sv();
+  const A=adP();
+  if(!A||!ad.ok||done.length<3||S.adn<3||Date.now()-(S.lastAd||0)<18e4||cur>=L.length-1)return;
+  await new Promise(r=>setTimeout(r,700));
+  if(!$('#lv').classList.contains('on'))return;
+  try{await A.showInterstitial();S.adn=0;S.lastAd=Date.now();sv()}catch(e){}
+  adPre();
+}
 function stats(){
   const pc=Math.round(done.length/L.length*100),R=52,C=2*Math.PI*R;
   const days=[...Array(7)].map((_,k)=>{const o=6-k;return{n:S.act[day(o)]||0,l:new Date(Date.now()-o*864e5).toLocaleDateString('ar',{weekday:'short'})}});
@@ -1219,7 +1259,7 @@ function paths(){
 }
 function settings(){
   const seg=(k,o,c)=>`<div class="seg">${o.map(x=>`<button data-${k}="${x[0]}"${String(c)===String(x[0])?' class="on"':''}>${x[1]}</button>`).join('')}</div>`;
-  $('#sets').innerHTML=`<div class="row"><h3>المظهر</h3>${seg('th',[['auto','تلقائي'],['light','فاتح'],['dark','داكن']],S.theme)}</div><div class="row"><h3>حجم الخط في الدروس</h3>${seg('fz',[[0.9,'صغير'],[1,'متوسط'],[1.15,'كبير']],S.fz)}</div><div class="row"><h3>البيانات</h3><p>يحذف تقدّمك وإحصائياتك من هذا الجهاز.</p><button class="dz" id="reset">${ic('trash',18)} إعادة ضبط التقدّم</button></div><p class="ft">Capacitor Nile، الإصدار 1.0</p>`;
+  $('#sets').innerHTML=`<div class="row"><h3>المظهر</h3>${seg('th',[['auto','تلقائي'],['light','فاتح'],['dark','داكن']],S.theme)}</div><div class="row"><h3>حجم الخط في الدروس</h3>${seg('fz',[[0.9,'صغير'],[1,'متوسط'],[1.15,'كبير']],S.fz)}</div>${ad.priv?'<div class="row"><h3>الإعلانات والخصوصية</h3><p>غيّر اختيارك بشأن الإعلانات المخصصة.</p><button class="dz" id="adpriv" style="color:var(--nile)">'+ic('sliders',18)+' خيارات الخصوصية</button></div>':''}<div class="row"><h3>البيانات</h3><p>يحذف تقدّمك وإحصائياتك من هذا الجهاز.</p><button class="dz" id="reset">${ic('trash',18)} إعادة ضبط التقدّم</button></div><p class="ft">Capacitor Nile، الإصدار 1.0</p>`;
 }
 IC.next='<path d="m15 18-6-6 6-6"/>';
 function render(){home();stats();paths();settings();const i=L.findIndex((_,k)=>!done.includes(k));$('#cta').innerHTML=(done.length===0?'ابدأ الرحلة':i<0?'استلم شهادتك':'تابع من المحطة '+(i+1))+ic('next',18)}
@@ -1232,13 +1272,14 @@ document.querySelectorAll('[data-menu]').forEach(b=>b.innerHTML=ic('menu'));
 $('#paths').onclick=e=>{const b=e.target.closest('.pt');if(!b)return;const l=PT[+b.dataset.p].l;history.pushState({l:1},'');open(l.find(i=>!done.includes(i))??l[0]);};
 $('#sets').onclick=e=>{
   const b=e.target.closest('button');if(!b)return;
+  if(b.id==='adpriv'){const A=adP();A&&A.showPrivacyOptionsForm().catch(()=>{});return}
   if(b.dataset.th){S.theme=b.dataset.th}
   else if(b.dataset.fz){S.fz=+b.dataset.fz}
   else if(b.id==='reset'){if(!confirm('حذف كل التقدّم والإحصائيات؟'))return;done=[];save();S.copies=0;S.act={};}
   sv();prefs();render();
 };
 const dr=$('#dr'),sc=$('#sc');
-const drawer=o=>{dr.classList.toggle('on',o);sc.classList.toggle('on',o)};
+const drawer=o=>{dr.classList.toggle('on',o);sc.classList.toggle('on',o);adsBanner(!o)};
 document.addEventListener('click',e=>{if(e.target.closest('[data-menu]'))drawer(true)});
 sc.onclick=()=>drawer(false);
 dr.innerHTML=`<div class="dh"><span class="sun2"></span><b dir="ltr">Capacitor Nile</b><span>تعلّم بناء تطبيقات Android</span></div>${[['about','info','عن التطبيق'],['apps','grid','المزيد من التطبيقات'],['ach','trophy','الإنجازات'],['cert','award','شهادة التخرج']].map(x=>`<button data-d="${x[0]}">${ic(x[1])}${x[2]}</button>`).join('')}`;
@@ -1248,7 +1289,7 @@ function pgAbout(){sheet('عن التطبيق',`<div class="ab"><span class="sun
 function pgApps(){const card=a=>{const g=a.u?'a':'div';return `<${g} class="ap"${a.u?` href="${a.u}" target="_blank" rel="noopener"`:''}><span class="ti">${ic(a.i||'phone',24)}</span><span><b>${a.n}</b><small>${a.d}</small></span>${a.f?`<em class="cur${a.cur?' on':''}">${a.cur?'نشط':'قريباً'}</em>`:''}</${g}>`};sheet('المزيد من التطبيقات','<h3 class="sh" style="margin-top:4px">عائلة النيل</h3>'+APPS.filter(a=>a.f).map(card).join('')+'<h3 class="sh">تطبيقات أخرى</h3>'+APPS.filter(a=>!a.f).map(card).join(''))}
 function pgAch(){const n=AC.filter(a=>a[3]()).length;sheet('الإنجازات',`<p class="ac0">${n} من ${AC.length} إنجازات مفتوحة</p><div class="ag">${AC.map(a=>{const u=a[3]();return `<div class="bd${u?' on':''}"><span>${ic(u?a[0]:'lock',26)}</span><b>${a[1]}</b><small>${a[2]}</small></div>`}).join('')}</div>`)}
 dr.onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;drawer(false);({about:pgAbout,apps:pgApps,ach:pgAch,cert:pgCert})[b.dataset.d]()};
-prefs();tab(0);render();
+prefs();tab(0);render();setTimeout(adsInit,600);
 
 
 </script>

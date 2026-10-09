@@ -88,6 +88,28 @@ jobs:
           sed -i -E 's/(versionName[[:space:]]*=?[[:space:]]*)"[^"]*"/\1"1.'$N'"/' android/app/build.gradle
           grep -E "targetSdkVersion[[:space:]]*=[[:space:]]*36" android/variables.gradle
           grep -E "versionCode[[:space:]]*=?[[:space:]]*$N" android/app/build.gradle
+      - name: Configure AdMob
+        env:
+          REAL_APP_ID: ${{ vars.ADMOB_APP_ID }}
+          REAL_BANNER: ${{ vars.ADMOB_BANNER_ID }}
+          REAL_INTER: ${{ vars.ADMOB_INTERSTITIAL_ID }}
+        run: |
+          if [ -n "$REAL_APP_ID" ]; then
+            if [ -z "$REAL_INTER" ]; then
+              echo "::error::Set ADMOB_INTERSTITIAL_ID together with ADMOB_APP_ID"
+              exit 1
+            fi
+            TEST=false
+          else
+            TEST=true
+            echo "::warning::Using Google test ads. Add the repository variables ADMOB_APP_ID and ADMOB_INTERSTITIAL_ID for live ads."
+          fi
+          APP_ID="${REAL_APP_ID:-ca-app-pub-3940256099942544~3347511713}"
+          BANNER="${REAL_BANNER:-ca-app-pub-3940256099942544/6300978111}"
+          INTER="${REAL_INTER:-ca-app-pub-3940256099942544/1033173712}"
+          sed -i "s|</application>|    <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"$APP_ID\"/>\n    </application>|" android/app/src/main/AndroidManifest.xml
+          grep -q "$APP_ID" android/app/src/main/AndroidManifest.xml
+          echo "window.ADS={banner:'$BANNER',inter:'$INTER',test:$TEST};" > www/ads-config.js
       - name: Generate icons
         if: ${{ hashFiles('assets/icon-only.png') != '' }}
         run: |
@@ -101,6 +123,11 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease bundleRelease
+
+      - name: Show Google Mobile Ads SDK version
+        run: |
+          cd android
+          ./gradlew app:dependencies --configuration releaseRuntimeClasspath | grep -m5 "play-services-ads" || true
 
       - name: Sign APK and AAB
         env:
