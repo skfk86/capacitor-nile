@@ -205,6 +205,7 @@ button,a{touch-action:manipulation}
 .pb small,.go2{color:color-mix(in srgb,var(--a) 60%,var(--ink))}
 .hero p{color:#eaf7f7}
 .adb{padding-bottom:calc(150px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)))}
+pre.dbg{direction:ltr;text-align:left;white-space:pre-wrap;word-break:break-all;font:11px/1.5 ui-monospace,Menlo,monospace;background:var(--bg);color:var(--ink);padding:10px;border-radius:12px;max-height:260px;overflow:auto;margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -1197,30 +1198,36 @@ async function shareCert(){
   T(L.length+' محطة - '+mins()+' دقيقة - الرتبة: '+rank(),1100,38,700);
   T(gdate(),1280,36,400,'#cfe8e8');T(serial(),1340,34,400,'#cfe8e8');
   c.toBlob(async b=>{const f=new File([b],'capacitor-nile-certificate.png',{type:'image/png'});
-    const P=window.Capacitor&&Capacitor.Plugins;
-    if(P&&P.Filesystem&&P.Share){try{
+    const FS=plug('Filesystem'),SH=plug('Share');
+    if(FS&&SH){try{
       const data=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.readAsDataURL(b)});
-      const w=await P.Filesystem.writeFile({path:f.name,data,directory:'CACHE'});
-      await P.Share.share({title:'شهادة Capacitor Nile',files:[w.uri]});return
+      const w=await FS.writeFile({path:f.name,data,directory:'CACHE'});
+      await SH.share({title:'شهادة Capacitor Nile',files:[w.uri]});return
     }catch(e){if(/cancel/i.test((e&&e.message)||''))return}}
     try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'شهادة Capacitor Nile'});return}}catch(e){if(e&&e.name==='AbortError')return}
     const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove()});
 }
 const ADS=Object.assign({banner:'ca-app-pub-3940256099942544/6300978111',inter:'ca-app-pub-3940256099942544/1033173712',test:true},window.ADS||{});
-const adP=()=>{const C=window.Capacitor;return C&&C.isNativePlatform&&C.isNativePlatform()&&C.Plugins&&C.Plugins.AdMob||null};
+const plug=n=>{const C=window.Capacitor;if(!C||!(C.isNativePlatform&&C.isNativePlatform()))return null;try{return (C.Plugins&&C.Plugins[n])||(C.registerPlugin&&C.registerPlugin(n))||null}catch(e){return null}};
+const adP=()=>plug('AdMob');
 const BANNER_ENABLED=false; // AdMob policy: no banner next to the bottom navigation bar
-const ad={ok:false,priv:false,on:false,want:false,q:Promise.resolve()};
+const ad={ok:false,priv:false,on:false,want:false,q:Promise.resolve(),log:[],dbg:false,tap:0,init:false};
+const adLog=m=>{ad.log.push(new Date().toLocaleTimeString('en-GB')+' '+m);if(ad.log.length>40)ad.log.shift()};
+const adErr=e=>(e&&(e.message||e.errorMessage||e.code))||JSON.stringify(e);
 async function adsInit(){
-  const A=adP();if(!A)return;
+  const C=window.Capacitor;
+  adLog('native='+!!(C&&C.isNativePlatform&&C.isNativePlatform())+' plugins='+Object.keys((C&&C.Plugins)||{}).join(','));
+  const A=adP();if(!A){adLog('AdMob plugin NOT found');return}
+  adLog('test='+ADS.test+' inter='+ADS.inter);
   try{
-    await A.initialize({initializeForTesting:ADS.test,tagForChildDirectedTreatment:false,tagForUnderAgeOfConsent:false});
-    let i=await A.requestConsentInfo();
-    if(i&&i.isConsentFormAvailable&&i.status==='REQUIRED')i=await A.showConsentForm();
+    await A.initialize({initializeForTesting:ADS.test,tagForChildDirectedTreatment:false,tagForUnderAgeOfConsent:false});ad.init=true;adLog('initialize ok');
+    let i=await A.requestConsentInfo();adLog('consent '+JSON.stringify(i));
+    if(i&&i.isConsentFormAvailable&&i.status==='REQUIRED'){i=await A.showConsentForm();adLog('form '+JSON.stringify(i))}
     ad.priv=!!(i&&i.privacyOptionsRequirementStatus==='REQUIRED');
-    ad.ok=!i||i.canRequestAds!==false;
-    if(ad.ok)adPre();
+    ad.ok=!i||i.canRequestAds!==false;adLog('canRequestAds='+ad.ok);
+    if(ad.ok)await adPre();
     settings();
-  }catch(e){}
+  }catch(e){adLog('init error: '+adErr(e))}
 }
 function adsBanner(on){
   if(!BANNER_ENABLED)return;
@@ -1234,15 +1241,26 @@ function adsBanner(on){
     }catch(e){}
   });
 }
-async function adPre(){const A=adP();if(!A||!ad.ok)return;try{await A.prepareInterstitial({adId:ADS.inter,isTesting:ADS.test})}catch(e){}}
+async function adPre(){const A=adP();if(!A||!ad.ok)return;try{await A.prepareInterstitial({adId:ADS.inter,isTesting:ADS.test});adLog('interstitial prepared')}catch(e){adLog('prepare error: '+adErr(e))}}
 async function adsAfterLesson(){
   S.adn=(S.adn||0)+1;sv();
   const A=adP();
-  if(!A||!ad.ok||done.length<3||S.adn<3||Date.now()-(S.lastAd||0)<18e4||cur>=L.length-1)return;
+  const why=!A?'no plugin':!ad.ok?'ads not ready':done.length<3?'done<3':S.adn<3?'count '+S.adn+'/3':Date.now()-(S.lastAd||0)<18e4?'cooldown':cur>=L.length-1?'last lesson':'';
+  if(why){adLog('skip: '+why);return}
   await new Promise(r=>setTimeout(r,700));
-  if(!$('#lv').classList.contains('on'))return;
-  try{await A.showInterstitial();S.adn=0;S.lastAd=Date.now();sv()}catch(e){}
+  if(!$('#lv').classList.contains('on')){adLog('skip: lesson closed');return}
+  try{await A.showInterstitial();S.adn=0;S.lastAd=Date.now();sv();adLog('interstitial shown')}catch(e){adLog('show error: '+adErr(e))}
   adPre();
+}
+async function adTest(){
+  const A=adP();adLog('test: start');
+  if(!A){adLog('test: no plugin');settings();return}
+  try{
+    if(!ad.init){await A.initialize({initializeForTesting:ADS.test});ad.init=true;adLog('test: initialize ok')}
+    await A.prepareInterstitial({adId:ADS.inter,isTesting:ADS.test});adLog('test: prepared');
+    await A.showInterstitial();adLog('test: shown');
+  }catch(e){adLog('test error: '+adErr(e))}
+  settings();
 }
 function stats(){
   const pc=Math.round(done.length/L.length*100),R=52,C=2*Math.PI*R;
@@ -1259,7 +1277,8 @@ function paths(){
 }
 function settings(){
   const seg=(k,o,c)=>`<div class="seg">${o.map(x=>`<button data-${k}="${x[0]}"${String(c)===String(x[0])?' class="on"':''}>${x[1]}</button>`).join('')}</div>`;
-  $('#sets').innerHTML=`<div class="row"><h3>المظهر</h3>${seg('th',[['auto','تلقائي'],['light','فاتح'],['dark','داكن']],S.theme)}</div><div class="row"><h3>حجم الخط في الدروس</h3>${seg('fz',[[0.9,'صغير'],[1,'متوسط'],[1.15,'كبير']],S.fz)}</div>${ad.priv?'<div class="row"><h3>الإعلانات والخصوصية</h3><p>غيّر اختيارك بشأن الإعلانات المخصصة.</p><button class="dz" id="adpriv" style="color:var(--nile)">'+ic('sliders',18)+' خيارات الخصوصية</button></div>':''}<div class="row"><h3>البيانات</h3><p>يحذف تقدّمك وإحصائياتك من هذا الجهاز.</p><button class="dz" id="reset">${ic('trash',18)} إعادة ضبط التقدّم</button></div><p class="ft">Capacitor Nile، الإصدار 1.0</p>`;
+  $('#sets').innerHTML=`<div class="row"><h3>المظهر</h3>${seg('th',[['auto','تلقائي'],['light','فاتح'],['dark','داكن']],S.theme)}</div><div class="row"><h3>حجم الخط في الدروس</h3>${seg('fz',[[0.9,'صغير'],[1,'متوسط'],[1.15,'كبير']],S.fz)}</div>${ad.dbg?'<div class="row"><h3>تشخيص الإعلانات</h3><pre class="dbg" id="adlog"></pre><button class="dz" id="adtest" style="color:var(--nile)">اختبر إعلاناً الآن</button></div>':''}${ad.priv?'<div class="row"><h3>الإعلانات والخصوصية</h3><p>غيّر اختيارك بشأن الإعلانات المخصصة.</p><button class="dz" id="adpriv" style="color:var(--nile)">'+ic('sliders',18)+' خيارات الخصوصية</button></div>':''}<div class="row"><h3>البيانات</h3><p>يحذف تقدّمك وإحصائياتك من هذا الجهاز.</p><button class="dz" id="reset">${ic('trash',18)} إعادة ضبط التقدّم</button></div><p class="ft" id="ver">Capacitor Nile، الإصدار 1.0</p>`;
+  const lg=$('#adlog');if(lg)lg.textContent=ad.log.join('\n')
 }
 IC.next='<path d="m15 18-6-6 6-6"/>';
 function render(){home();stats();paths();settings();const i=L.findIndex((_,k)=>!done.includes(k));$('#cta').innerHTML=(done.length===0?'ابدأ الرحلة':i<0?'استلم شهادتك':'تابع من المحطة '+(i+1))+ic('next',18)}
@@ -1271,7 +1290,9 @@ $('#nav').onclick=e=>{const b=e.target.closest('button');if(b){tab(+b.dataset.t)
 document.querySelectorAll('[data-menu]').forEach(b=>b.innerHTML=ic('menu'));
 $('#paths').onclick=e=>{const b=e.target.closest('.pt');if(!b)return;const l=PT[+b.dataset.p].l;history.pushState({l:1},'');open(l.find(i=>!done.includes(i))??l[0]);};
 $('#sets').onclick=e=>{
+  if(e.target.id==='ver'){if(++ad.tap>=5&&!ad.dbg){ad.dbg=true;settings()}return}
   const b=e.target.closest('button');if(!b)return;
+  if(b.id==='adtest'){adTest();return}
   if(b.id==='adpriv'){const A=adP();A&&A.showPrivacyOptionsForm().catch(()=>{});return}
   if(b.dataset.th){S.theme=b.dataset.th}
   else if(b.dataset.fz){S.fz=+b.dataset.fz}
