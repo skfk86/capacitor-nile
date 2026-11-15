@@ -266,7 +266,7 @@ addEventListener('message',e=>{if(!pv||!e.data||!e.data.pg||e.source!==pv.queryS
 
 /* ===================== زر الرجوع ===================== */
 const prevB=window.NXB;
-window.NXB=()=>{if(ed){if(!ac.hidden){hideAC();return true}if(pv){closePreview();return true}const r=ed.querySelector('.eres');if(r){r.remove();return true}if(termOn()){hideTerm();return true}close();return true}return prevB?prevB():false};
+window.NXB=()=>{if(document.querySelector('#term:not(.emb)'))return prevB?prevB():false;if(ed){if(!ac.hidden){hideAC();return true}if(pv){closePreview();return true}const r=ed.querySelector('.eres');if(r){r.remove();return true}if(termOn()){hideTerm();return true}close();return true}return prevB?prevB():false};
 
 function files(){return E&&E.free?E.files:Object.assign({},FILES0,S.pgf||{})}
 function setFile(k,d){if(!k)return;const f=files();f[k]=d;S.pgf=Object.assign({},S.pgf||{},{[k]:d});sv();if(E&&E.free){E.files[k]=d;if(E.tab===k){const p=ta.selectionStart;ta.value=d;ta.setSelectionRange(Math.min(p,d.length),Math.min(p,d.length));paint();sync()}}}
