@@ -201,6 +201,7 @@ $('#paths').addEventListener('click',e=>{const c=e.target.closest('.chc');if(!c)
 /* ===== التذكير اليومي ===== */
 const LN=()=>plug('LocalNotifications');
 async function setRemind(on){
+  if(window.NXN)return window.NXN.setEnabled(on);
   const N=LN();
   if(!N){toast('التذكير يعمل داخل التطبيق على الهاتف فقط');return false}
   try{
@@ -261,14 +262,16 @@ function onboard(){
   const slides=[
     ()=>`<span class="sun2 big"></span><h2>أهلاً بك في Capacitor Nile</h2><p>من صفحة ويب بسيطة إلى تطبيق Android منشور، وكل ذلك من هاتفك.</p><button class="go obn">لنبدأ</button>`,
     ()=>`<h2>من أين تبدأ؟</h2><p>سنقترح لك نقطة البداية المناسبة.</p>${lvls.map((l,k)=>`<button class="obo" data-l="${k}"><b>${l[0]}</b><small>${l[1]}</small></button>`).join('')}`,
-    ()=>`<h2>ما هدفك اليومي؟</h2><p>الالتزام القليل كل يوم أفضل من الكثير مرة واحدة.</p>${goals.map(g=>`<button class="obo" data-g="${g[0]}"><b>${g[1]} · ${g[0]} XP</b><small>${g[2]}</small></button>`).join('')}<p class="obt">${ic('bell',16)} يمكنك تفعيل تذكير يومي من الإعدادات.</p>`
+    ()=>`<h2>ما هدفك اليومي؟</h2><p>الالتزام القليل كل يوم أفضل من الكثير مرة واحدة.</p>${goals.map(g=>`<button class="obo" data-g="${g[0]}"><b>${g[1]} · ${g[0]} XP</b><small>${g[2]}</small></button>`).join('')}`,
+    ()=>`${ic('bell',40)}<h2>متى نذكّرك؟</h2><p>نرسل لك تذكيراً واحداً في الوقت الذي يناسبك، ونخبرك قبل أن تنقطع سلسلتك.</p>${[[20,'مساءً','8:00 م'],[9,'صباحاً','9:00 ص'],[14,'ظهراً','2:00 م']].map(r=>`<button class="obo" data-r="${r[0]}"><b>${r[1]}</b><small>${r[2]}</small></button>`).join('')}<button class="obs2" data-r="0">ليس الآن</button>`
   ];
   const draw=()=>{el.innerHTML=`<div class="obc">${slides[st]()}</div><div class="dots">${slides.map((_,k)=>`<i${k===st?' class="on"':''}></i>`).join('')}</div>${st?'':'<button class="obs">تخطّي</button>'}`};
   el.onclick=e=>{
     if(e.target.closest('.obs')){fin(false);return}
     if(e.target.closest('.obn')){st=1;draw();return}
     const l=e.target.closest('[data-l]');if(l){start=lvls[+l.dataset.l][2];st=2;draw();return}
-    const g=e.target.closest('[data-g]');if(g){S.goal=+g.dataset.g;fin(true)}
+    const g=e.target.closest('[data-g]');if(g){S.goal=+g.dataset.g;st=3;draw();return}
+    const r=e.target.closest('[data-r]');if(r){const h=+r.dataset.r;if(h){S.rh=h;Promise.resolve(setRemind(true)).then(ok=>{if(ok){S.rem=true;sv()}})}fin(true)}
   };
   const fin=go=>{S.ob=1;sv();el.remove();render();if(go){history.pushState({l:1},'');open(start)}};
   draw();document.body.appendChild(el);
