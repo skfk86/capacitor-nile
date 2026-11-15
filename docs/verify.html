@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>التحقق من شهادة Capacitor Nile</title>
-<meta name="description" content="تحقق من صحة شهادات إتمام دورة Capacitor Nile الموثّقة.">
+<title>التحقق من الشهادات · أكاديمية مبرمج سوداني</title>
+<meta name="description" content="تحقق من صحة شهادات أكاديمية مبرمج سوداني الموثّقة.">
 <style>
 :root{--bg:#eef5f4;--sur:#fff;--ink:#0a2a30;--mut:#55707a;--nile:#0b7a85;--sun:#f0a81e;--ok:#2f9e6e;--bad:#d6604d}
 @media (prefers-color-scheme:dark){:root{--bg:#06171b;--sur:#0d252b;--ink:#e4f1f0;--mut:#8fb0b3;--nile:#2db3bf}}
@@ -29,7 +29,7 @@ footer{margin-top:24px;color:var(--mut);font-size:13px;text-align:center}
 </style>
 </head>
 <body>
-<header><div class="sun"></div><h1>التحقق من شهادة Capacitor Nile</h1><p>شهادات إتمام موثّقة لدورة بناء تطبيقات Android</p></header>
+<header><div class="sun"></div><h1>التحقق من الشهادات</h1><p>أكاديمية مبرمج سوداني · شهادات إتمام موثّقة</p></header>
 <main class="card">
   <form id="f"><input id="id" placeholder="CN-XXXX-XXXX" autocomplete="off" aria-label="رقم الشهادة" maxlength="12"><button>تحقق</button></form>
   <div class="res" id="res" aria-live="polite"></div>
@@ -53,7 +53,7 @@ async function check(id){
       <div><dt>نتيجة الاختبار النهائي</dt><dd>${r.score}%</dd></div>
       <div><dt>حساب GitHub</dt><dd dir="ltr"><a href="https://github.com/${esc(r.login)}" rel="noopener">@${esc(r.login)}</a></dd></div>
       <div><dt>التطبيق الذي بناه</dt><dd><a href="${esc(r.repo_url)}" rel="noopener">المستودع</a>${r.apk_url?` · <a href="${esc(r.apk_url)}" rel="noopener">APK</a>`:''}</dd></div>
-    </dl><p class="dim">الدورة: Capacitor Nile — HTML وCSS وJavaScript وCapacitor وGitHub Actions</p>`;
+    </dl><dl style="margin-top:0"><div><dt>الجهة المانحة</dt><dd>أكاديمية مبرمج سوداني</dd></div><div><dt>الدورة</dt><dd>بناء تطبيقات Android بتقنية Capacitor</dd></div></dl>`;
   }catch(e){$('#res').innerHTML=`<div class="badge bad">${BAD} تعذّر الاتصال، حاول لاحقاً</div>`}
 }
 $('#f').onsubmit=e=>{e.preventDefault();check($('#id').value)};
