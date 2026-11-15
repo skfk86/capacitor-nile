@@ -28,9 +28,9 @@ function quizHTML(i){
   if(!Q[i])return '';
   const passed=done.includes(i)||S.qp[i];
   qs={i,ok:{},miss:{}};
-  return `<section class="qz${passed?' ok':''}"><div class="qh">${ic('target',20)}<b>اختبر فهمك</b><span>${passed?'مكتمل':Q[i].length+' أسئلة'}</span></div>${Q[i].map((q,k)=>`<div class="qq" data-k="${k}"><p>${k+1}. ${esc(q[0])}</p>${order(i,k,q[1].length).map(o=>`<button class="qo${passed&&o===q[2]?' r':''}" data-o="${o}">${esc(q[1][o])}</button>`).join('')}</div>`).join('')}</section>`;
+  return `<section class="qz${passed?' ok':''}"><div class="qh">${ic('target',20)}<b>اختبر فهمك</b><span>${passed?'مكتمل':Q[i].length+' أسئلة'}</span></div>${Q[i].map((q,k)=>`<div class="qq" data-k="${k}"><p>${k+1}. ${esc(q[0])}</p>${order(i,k,q[1].length).map((o,n)=>`<button class="qo${passed&&o===q[2]?' r':''}" data-o="${o}"><i>${'أبجد'[n]}</i><span>${esc(q[1][o])}</span></button>`).join('')}</div>`).join('')}</section>`;
 }
-function lockGo(){const g=$('#lv .go');if(!g)return;const lk=needQuiz(cur);g.classList.toggle('lk',lk);if(lk)g.innerHTML=ic('lock',18)+' أجب عن الأسئلة لفتح المحطة التالية'}
+function lockGo(){const g=$('#lv .go');if(!g)return;const lk=needQuiz(cur);g.classList.toggle('lk',lk);if(lk){const n=qs&&qs.i===cur?Object.keys(qs.ok).length:0;g.innerHTML=ic('lock',18)+` أجب عن الأسئلة لفتح التالية <small>${n}/${Q[cur].length}</small>`}}
 
 /* ===== المحرر الحي ===== */
 const WRAP={
@@ -153,7 +153,7 @@ $('#lv').addEventListener('click',e=>{
   if(o){e.stopImmediatePropagation();const qq=o.closest('.qq'),k=+qq.dataset.k,q=Q[cur][k];
     if(o.closest('.qz.ok')||qs.ok[k])return;
     const r=+o.dataset.o===q[2];o.classList.add(r?'r':'w');
-    if(r){qs.ok[k]=1;qq.querySelectorAll('.qo').forEach(b=>b.disabled=true);if(!qs.miss[k])addXP(5,'إجابة صحيحة')}
+    if(r){qs.ok[k]=1;lockGo();qq.querySelectorAll('.qo').forEach(b=>b.disabled=true);if(!qs.miss[k])addXP(5,'إجابة صحيحة')}
     else{qs.miss[k]=1;navigator.vibrate&&navigator.vibrate(40)}
     if(Q[cur].every((_,j)=>qs.ok[j])){S.qp[cur]=1;sv();o.closest('.qz').classList.add('ok');lockGo();const g=$('#lv .go');if(g)g.innerHTML='أتممت المحطة وانتقل للتالية';toast('ممتاز! فُتحت المحطة التالية')}
     return}
@@ -163,13 +163,19 @@ $('#lv').addEventListener('click',e=>{
 },true);
 
 const _home=home;
-home=function(){_home();$('#chips').insertAdjacentHTML('beforeend',`<span class="chip">${ic('zap',16)} ${S.xp} XP · المستوى ${lvl()}</span>`)};
+home=function(){_home();
+  const t=todayXP(),p=Math.min(1,t/S.goal),C=2*Math.PI*15;
+  let r=document.querySelector('.prog .pst');if(!r){r=document.createElement('div');r.className='pst';document.querySelector('.prog').appendChild(r)}
+  r.innerHTML=`<span><b>${ic('flame',18)} ${streak()}</b><small>سلسلة الأيام</small></span><span><b>${ic('zap',18)} ${S.xp}</b><small>المستوى ${lvl()}</small></span><span class="pgr"><svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><circle cx="19" cy="19" r="15" fill="none" stroke="var(--line)" stroke-width="5"/><circle cx="19" cy="19" r="15" fill="none" stroke="var(--sun)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p)}" transform="rotate(-90 19 19)"/></svg><span><b>${t}/${S.goal}</b><small>هدف اليوم</small></span></span>`;
+  const n=L.findIndex((_,k)=>!done.includes(k));document.querySelectorAll('#route .st').forEach(s=>s.classList.toggle('cur',+s.dataset.i===n));
+  const c=document.querySelector('#route .st.cur .card');if(c&&!c.querySelector('.nx'))c.insertAdjacentHTML('afterbegin','<span class="nx">التالية</span>');
+};
 
 const _stats=stats;
 stats=function(){
   _stats();
   const t=todayXP(),p=Math.min(1,t/S.goal),R=26,C=2*Math.PI*R,into=S.xp%100;
-  $('#stats').insertAdjacentHTML('afterbegin',`<div class="xpc"><div class="xr"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="${R}" fill="none" stroke="var(--line)" stroke-width="7"/><circle cx="32" cy="32" r="${R}" fill="none" stroke="var(--sun)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p)}" transform="rotate(-90 32 32)"/></svg><b>${Math.round(p*100)}%</b></div>
+  $('#stats').insertAdjacentHTML('afterbegin',`<div class="xpc hero"><div class="xr"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="${R}" fill="none" stroke="var(--line)" stroke-width="7"/><circle cx="32" cy="32" r="${R}" fill="none" stroke="var(--sun)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p)}" transform="rotate(-90 32 32)"/></svg><b>${Math.round(p*100)}%</b></div>
   <div class="xt"><h3>الهدف اليومي</h3><p>${t} من ${S.goal} XP اليوم${t>=S.goal?' · تحقق!':''}</p><p>${ic('flame',15)} سلسلة ${streak()} ${streak()===1?'يوم':'أيام'}</p></div></div>
   <div class="xpc lv"><div class="xt"><h3>المستوى ${lvl()}</h3><p>${S.xp} XP إجمالاً · ${100-into} للمستوى التالي</p><div class="bar0"><div style="width:${into}%;height:100%;background:var(--nile);border-radius:4px"></div></div></div></div>`);
 };

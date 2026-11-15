@@ -258,6 +258,66 @@ code.gt{cursor:help;text-decoration:underline dotted color-mix(in srgb,var(--sun
 .obs{position:absolute;top:calc(max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)) + 14px);inset-inline-start:18px;color:#cfe8e8;min-height:44px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
+
+/* ===== طبقة التصميم العالمي ===== */
+:root{--sh1:0 1px 2px rgba(6,36,42,.06),0 2px 8px rgba(6,36,42,.05);--sh2:0 4px 12px rgba(6,36,42,.08),0 12px 32px rgba(6,36,42,.08);--r:20px;--ease:cubic-bezier(.2,.8,.2,1)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--sh1:0 1px 2px rgba(0,0,0,.35);--sh2:0 8px 28px rgba(0,0,0,.45)}}
+:root[data-theme=dark]{--sh1:0 1px 2px rgba(0,0,0,.35);--sh2:0 8px 28px rgba(0,0,0,.45)}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"kern"}
+h1,h2,h3,b{letter-spacing:-.01em}
+.prog,.card,.pt,.row,.sb,.ring,.xpc,.chc,.pjcard,.sw,.qz,.ap,.gc{box-shadow:var(--sh1);border-color:color-mix(in srgb,var(--line) 70%,transparent)}
+button,.chc,.pjcard,.st .card{transition:transform .18s var(--ease),box-shadow .18s var(--ease),background-color .2s}
+button:active:not(:disabled),.chc:active,.pjcard:active{transform:scale(.97)}
+.st:active .card{transform:scale(.985)}
+.tab.on{animation:tabIn .32s var(--ease)}
+@keyframes tabIn{from{opacity:0;transform:translateY(8px)}}
+/* الصفحة الرئيسية */
+.prog{border-radius:24px;padding:18px 18px 14px;box-shadow:var(--sh2)}
+.pst{display:flex;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.pst>span{flex:1;display:flex;flex-direction:column;align-items:center;gap:0;line-height:1.35}
+.pst>span+span{border-inline-start:1px solid var(--line)}
+.pst b{display:flex;align-items:center;gap:4px;font-size:17px}.pst b svg{color:var(--sun)}
+.pst small{font-size:11.5px;color:var(--mut)}
+.pst .pgr{flex-direction:row;justify-content:center;gap:8px}.pst .pgr>span{display:flex;flex-direction:column;line-height:1.35}
+.pjcard{background:linear-gradient(135deg,color-mix(in srgb,var(--sun) 10%,var(--sur)),var(--sur) 60%)}
+.pjcard .pje{box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.sbx{padding-top:16px}
+.sw{border-radius:18px;background:var(--sur)}
+.st.cur .card{border:2px solid var(--sun);box-shadow:0 8px 24px color-mix(in srgb,var(--sun) 28%,transparent)}
+.st.cur .nd i{background:var(--sun);border-color:var(--sun);color:#3a2600;box-shadow:0 0 0 6px color-mix(in srgb,var(--sun) 22%,transparent);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 11px color-mix(in srgb,var(--sun) 6%,transparent)}}
+.nx{align-self:flex-start;display:inline-block;padding:1px 10px;margin-bottom:4px;border-radius:99px;background:var(--sun);color:#3a2600;font-size:11.5px;font-weight:700}
+.st:not(.done):not(.cur) .card{opacity:.92}
+/* الدرس */
+article{max-width:680px;margin:auto}
+article p,article li{font-size:calc(16.5px * var(--fz,1));line-height:1.95}
+article h3{margin-top:26px;font-size:calc(19px * var(--fz,1))}
+.code{border-radius:16px;box-shadow:var(--sh2)}
+.act{background:none;padding-top:12px;isolation:isolate}
+.act::before{content:"";position:absolute;inset:0;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);z-index:-1}
+.go{border-radius:16px;box-shadow:0 6px 18px color-mix(in srgb,var(--nile) 35%,transparent);margin-top:0}
+.go.lk{box-shadow:none;background:var(--bg);border:1.5px dashed var(--line);color:var(--mut)}
+:root .act .go.lk{color:var(--mut)}
+.go small{padding:1px 8px;border-radius:99px;background:var(--bg);font-size:12px}
+/* الاختبار */
+.qz{border-radius:24px;padding:18px}
+.qo{display:flex;align-items:center;gap:12px;border-radius:16px;padding:10px 12px;background:var(--sur)}
+.qo i{flex:none;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:14px;background:var(--bg);color:var(--mut);transition:.2s}
+.qo.r i{background:#2f9e6e;color:#fff}.qo.w i{background:#d6604d;color:#fff}
+.qo:disabled:not(.r){opacity:.55}
+/* الإحصائيات */
+.xpc.hero{background:linear-gradient(135deg,#0b7a85,#063a42);color:#fff;border:0;box-shadow:var(--sh2)}
+.xpc.hero p{color:#cfe8e8}.xpc.hero h3{color:#fff}
+.xpc.hero circle:first-child{stroke:rgba(255,255,255,.18)}
+.xpc.lv .bar0>div{background:linear-gradient(90deg,var(--sun),#ffd877)!important}
+/* عناصر عامة */
+#toast{top:calc(max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)) + 12px);bottom:auto;border-radius:99px;box-shadow:var(--sh2);font-weight:700;transform:translateY(-14px)}
+#toast.on{transform:none}
+.nav{box-shadow:0 -1px 0 var(--line),0 -6px 24px rgba(6,36,42,.06)}
+.nav button.on svg{transform:translateY(-1px)}
+.top h1{font-size:28px}
+.seg button{transition:background .2s,color .2s}
+
 /* ===== مشروعي ===== */
 .pjcard{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:20px 20px 0;padding:14px 16px;text-align:start;background:var(--sur);border:1px solid var(--line);border-radius:20px}
 .pjcard>span:nth-child(2){flex:1;display:flex;flex-direction:column;line-height:1.5}.pjcard small,.pjadd small{color:var(--mut);font-size:12px}.pjcard em{font-style:normal;font-size:13px;color:var(--nile)}
