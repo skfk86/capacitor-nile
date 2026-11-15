@@ -396,6 +396,26 @@ article h3{margin-top:26px;font-size:calc(19px * var(--fz,1))}
 .econ[hidden]{display:none}
 .ech{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;font:12px ui-monospace,monospace;color:#7d959d}.ecl{color:#82aaff;min-height:32px}
 .econ pre{overflow:auto;padding:4px 12px 10px;font:12.5px/1.6 ui-monospace,monospace;white-space:pre-wrap}.econ .error,.econ .warn{color:#ff8a80}.econ .dim{color:#5f7e85}
+
+/* ===== لوحة الطرفية داخل المحرر ===== */
+.etp{flex:none;display:flex;flex-direction:column;min-height:140px;background:#0c1115;border-top:1px solid #1e3039;position:relative}
+.etp[hidden]{display:none}
+.eth{flex:none;height:18px;display:grid;place-items:center;cursor:row-resize;touch-action:none;background:#111a1f}
+.eth i{width:40px;height:4px;border-radius:2px;background:#36505a}
+.etm{flex:1;min-height:0;display:flex}
+#term.emb{position:relative;inset:auto;z-index:auto;flex:1;min-height:0;min-width:0;width:100%;font-size:13px}
+#ed:not(.tf) #term.emb .tkeys{display:none}
+#term.emb .tbar{padding:2px 6px;background:#111a1f}
+#term.emb .tbar b{font-size:11px;letter-spacing:.08em;color:#7d959d}
+#term.emb .tbar .tx{width:32px;height:32px;transform:rotate(90deg)}
+#term.emb .thelp{min-height:28px;font-size:12px}
+#term.emb .tout{padding:6px 10px 2px}
+#term.emb .tin{padding:2px 10px}
+#term.emb .tkeys{display:flex;overflow-x:auto;padding:2px;scrollbar-width:none}#term.emb .tkeys::-webkit-scrollbar{display:none}
+#term.emb .tkeys button{flex:none;min-width:46px;min-height:36px}
+#ed.tf .ekeys{display:none}
+.etg.on{background:#24414c;color:#7ee2a8}
+.ebar .tsp{flex:1}
 /* ===== مشروعي ===== */
 .pjcard{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:20px 20px 0;padding:14px 16px;text-align:start;background:var(--sur);border:1px solid var(--line);border-radius:20px}
 .pjcard>span:nth-child(2){flex:1;display:flex;flex-direction:column;line-height:1.5}.pjcard small,.pjadd small{color:var(--mut);font-size:12px}.pjcard em{font-style:normal;font-size:13px;color:var(--nile)}

@@ -2,7 +2,10 @@
 (()=>{
 const {toast,esc,addXP}=window.NX;
 Object.assign(IC,{term2:'<polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/>'});
-const HOME='/data/data/com.termux/files/home',PRJ=HOME+'/my-nile-app';
+const HOME='/data/data/com.termux/files/home',PRJ=HOME+'/my-nile-app',PG=HOME+'/playground';
+const PGF={'index.html':'html','style.css':'css','script.js':'js'};
+const inPG=p=>p===PG||p.startsWith(PG+'/');
+function pgTree(){const f=window.NXE?window.NXE.files():(S.pgf||{});const r=dir();for(const [n,k] of Object.entries(PGF))r.c[n]={t:'f',d:f[k]||''};return r}
 
 /* ===== نظام الملفات الافتراضي ===== */
 const dir=()=>({t:'d',c:{}});
@@ -33,13 +36,14 @@ function prjTree(){
   return r;
 }
 function node(p){
+  if(inPG(p)){let n=pgTree();for(const x of p.slice(PG.length).split('/').filter(Boolean)){if(!n||n.t!=='d')return null;n=n.c[x]}return n||null}
   if(inPrj(p)){let n=prjTree();for(const x of p.slice(PRJ.length).split('/').filter(Boolean)){if(!n||n.t!=='d')return null;n=n.c[x]}return n||null}
   let n=FS;for(const x of p.split('/').filter(Boolean)){if(!n||n.t!=='d')return null;n=n.c[x]}
-  if(p===HOME&&n)n.c['my-nile-app']=n.c['my-nile-app']||{t:'d',c:{},v:1};
+  if(p===HOME&&n){n.c['my-nile-app']=n.c['my-nile-app']||{t:'d',c:{},v:1};n.c.playground=n.c.playground||{t:'d',c:{},v:1}}
   return n||null;
 }
 function parentOf(p){const i=p.lastIndexOf('/');return [p.slice(0,i)||'/',p.slice(i+1)]}
-const RO=p=>inPrj(p)?'هذا مجلد مشروعك ويُولَّد تلقائياً من المحطات. غيّر الاسم واللون من «مشروعي».':'';
+const RO=p=>inPG(p)&&!PGF[p.slice(PG.length+1)]?'مجلد الملعب فيه ملفات المحرر الثلاثة فقط: index.html وstyle.css وscript.js.':inPrj(p)?'هذا مجلد مشروعك ويُولَّد تلقائياً من المحطات. غيّر الاسم واللون من «مشروعي».':'';
 
 /* ===== تلوين الأوامر ===== */
 function hlCmd(s){let o='',first=true;
@@ -59,14 +63,16 @@ let el=null,out,inp,ctrl=false,hi=-1,queue=[],busy=false;
 const PROMPT=()=>`<span class="tp">${esc(short(T.cwd))} $</span> `;
 function print(t,c=''){const d=document.createElement('div');d.className='tl '+c;d.dir='ltr';d.innerHTML=t;out.appendChild(d);while(out.childElementCount>600)out.firstChild.remove();out.scrollTop=out.scrollHeight}
 const pr=(t,c)=>print(esc(t),c);
-function openTerm(cmds){
-  if(el){if(cmds)feed(cmds);return}
-  el=document.createElement('div');el.id='term';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.setAttribute('aria-label','الطرفية');
-  el.innerHTML=`<div class="tbar"><button class="tx" aria-label="إغلاق">${ic('x',20)}</button><b dir="ltr">Termux · Nile</b><span class="tsp"></span><button class="thelp">help</button></div>
+let OPT={};
+function openTerm(cmds,opt={}){
+  if(el){if(opt.cwd&&node(opt.cwd)){T.cwd=opt.cwd;updPrompt()}if(cmds)feed(cmds);return}
+  OPT=opt;if(opt.cwd&&node(opt.cwd))T.cwd=opt.cwd;
+  el=document.createElement('div');el.id='term';el.setAttribute('aria-label','الطرفية');if(opt.mount)el.className='emb';else{el.setAttribute('role','dialog');el.setAttribute('aria-modal','true')}
+  el.innerHTML=`<div class="tbar"><button class="tx" aria-label="إغلاق">${ic(opt.mount?'back':'x',opt.mount?16:20)}</button><b dir="ltr">${opt.mount?'TERMINAL':'Termux · Nile'}</b><span class="tsp"></span><button class="thelp">help</button></div>
   <div class="tout" dir="ltr" aria-live="polite"></div>
   <div class="tin" dir="ltr"><span class="tpr"></span><div class="tiw"><div class="tih" aria-hidden="true"></div><input autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="send" aria-label="اكتب أمراً"></div></div>
   <div class="tkeys" dir="ltr">${['ESC','CTRL','TAB','↑','↓','←','→','/','-','|','~','.'].map(k=>`<button data-k="${k}">${k}</button>`).join('')}</div>`;
-  document.body.appendChild(el);document.body.classList.add('pgon');
+  if(opt.mount)opt.mount.appendChild(el);else{document.body.appendChild(el);document.body.classList.add('pgon')}
   out=el.querySelector('.tout');inp=el.querySelector('input');
   if(!T.n){pr('Welcome to Termux · Capacitor Nile edition','dim');print('<span dir="rtl">طرفية تدريبية آمنة: جرّب أي أمر دون خوف. اكتب <b>help</b> للبداية.</span>','ok')}
   else pr('Termux · Nile — type help','dim');
@@ -79,8 +85,8 @@ function openTerm(cmds){
   setTimeout(()=>inp.focus(),60);
   if(cmds)feed(cmds);
 }
-function closeTerm(){if(!el)return;if(el.querySelector('.nano'))return closeNano(false);el.remove();el=null;document.body.classList.remove('pgon');saveT2()}
-window.NXB=()=>{if(el){closeTerm();return true}return false};
+function closeTerm(){if(!el)return;if(el.querySelector('.nano'))return closeNano(false);const emb=el.classList.contains('emb');el.remove();el=null;if(!emb)document.body.classList.remove('pgon');saveT2();const cb=OPT.onClose;OPT={};cb&&cb()}
+window.NXB=()=>{if(el&&!el.classList.contains('emb')){closeTerm();return true}return false};
 const updPrompt=()=>{el.querySelector('.tpr').innerHTML=PROMPT()};
 function feed(cmds){queue=cmds.split('\n').map(x=>x.trim()).filter(x=>x&&!x.startsWith('#'));nextQ()}
 function nextQ(){if(queue.length){inp.value=queue.shift();inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);el.querySelector('.tin').classList.add('q')}else el.querySelector('.tin').classList.remove('q')}
@@ -169,7 +175,7 @@ async function exec(s){
   if(redir){const p=norm(rf);if(RO(p)){pr('bash: '+rf+': Read-only file system','err');return false}
     const [pp,nm]=parentOf(p),pn=node(pp);if(!pn||pn.t!=='d'){pr('bash: '+rf+': No such file or directory','err');return false}
     const ex=pn.c[nm];if(ex&&ex.t==='d'){pr('bash: '+rf+': Is a directory','err');return false}
-    const txt=buf.join('\n')+(buf.length?'\n':'');pn.c[nm]={t:'f',d:redir==='>>'&&ex?ex.d+txt:txt}}
+    const txt=buf.join('\n')+(buf.length?'\n':'');writeF(p,redir==='>>'&&ex?ex.d+txt:txt)}
   return res;
 }
 const lev=(a,b)=>{const m=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=m[0];m[0]=i;for(let j=1;j<=b.length;j++){const t=m[j];m[j]=Math.min(m[j]+1,m[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return m[b.length]};
@@ -207,7 +213,7 @@ mkdir:{fn:(a,o)=>{const [f,r]=flags(a);if(!r.length)return o.err('mkdir: missing
 touch:{fn:(a,o)=>{if(!a.length)return o.err('touch: missing file operand');for(const t of a){const p=norm(t);if(RO(p))return o.err(`touch: cannot touch '${t}': Read-only file system`);const [pp,nm]=parentOf(p),pn=node(pp);if(!pn||pn.t!=='d')return o.err(`touch: cannot touch '${t}': No such file or directory`);pn.c[nm]=pn.c[nm]||{t:'f',d:''}}}},
 cat:{fn:(a,o)=>{if(!a.length)return o.err('cat: missing operand');for(const t of a){const n=node(norm(t));if(!n)return o.err(`cat: ${t}: No such file or directory`);if(n.t==='d')return o.err(`cat: ${t}: Is a directory`);const d=n.d.replace(/\n$/,'');const ext=(t.match(/\.(html|css|js|json|ya?ml|sh)$/)||[])[1];if(d&&ext&&!o.redir&&window.NXE){o.html(window.NXE.hl(d,{yml:'yaml',sh:'bash'}[ext]||ext))}else if(d)d.split('\n').forEach(x=>o.out(x))}}},
 rm:{fn:(a,o)=>{const [f,r]=flags(a);if(!r.length)return o.err('rm: missing operand');for(const t of r){const p=norm(t);
-  if(p==='/'||p===HOME||HOME.startsWith(p+'/'))return o.err(`rm: refusing to remove '${t}'`);if(RO(p)||p===PRJ)return o.err(`rm: cannot remove '${t}': Read-only file system`);
+  if(p==='/'||p===HOME||HOME.startsWith(p+'/'))return o.err(`rm: refusing to remove '${t}'`);if(RO(p)||p===PRJ||inPG(p))return o.err(`rm: cannot remove '${t}': Read-only file system`);
   const [pp,nm]=parentOf(p),pn=node(pp);if(!pn||!pn.c[nm]){if(f.has('f'))continue;return o.err(`rm: cannot remove '${t}': No such file or directory`)}
   if(pn.c[nm].t==='d'&&!f.has('r'))return o.err(`rm: cannot remove '${t}': Is a directory`);delete pn.c[nm]}}},
 mv:{fn:(a,o)=>cpmv(a,o,true)},
@@ -230,7 +236,7 @@ git:{need:'git',fn:(a,o)=>git(a,o)}
 function cpmv(a,o,mv){const [f,r]=flags(a);const nm=mv?'mv':'cp';if(r.length<2)return o.err(`${nm}: missing destination file operand`);
   const [s,d]=r,sp=norm(s),dp0=norm(d),sn=node(sp);if(!sn)return o.err(`${nm}: cannot stat '${s}': No such file or directory`);
   if(sn.t==='d'&&!mv&&!f.has('r'))return o.err(`cp: -r not specified; omitting directory '${s}'`);
-  if((mv&&RO(sp))||RO(dp0))return o.err(`${nm}: Read-only file system`);
+  if((mv&&(RO(sp)||inPG(sp)))||RO(dp0))return o.err(`${nm}: Read-only file system`);
   let dp=dp0;const dn=node(dp0);if(dn&&dn.t==='d')dp=dp0+'/'+parentOf(sp)[1];
   if(dp===sp||dp.startsWith(sp+'/'))return o.err(`${nm}: cannot move '${s}' to a subdirectory of itself`);
   const [pp,nn]=parentOf(dp),pn=node(pp);if(!pn||pn.t!=='d')return o.err(`${nm}: cannot create '${d}': No such file or directory`);
@@ -252,7 +258,7 @@ async function pkg(a,o){
   o.err(`Unknown command: '${c}' (run 'pkg help' for usage information)`);
 }
 function readJSON(p){const n=node(p);if(!n||n.t!=='f')return null;try{return JSON.parse(n.d)}catch(e){return undefined}}
-function writeF(p,d){if(RO(p))return false;const [pp,nm]=parentOf(p),pn=node(pp);if(!pn)return false;pn.c[nm]={t:'f',d};return true}
+function writeF(p,d){if(RO(p))return false;if(inPG(p)){window.NXE&&window.NXE.setFile(PGF[p.slice(PG.length+1)],d);return true}const [pp,nm]=parentOf(p),pn=node(pp);if(!pn)return false;pn.c[nm]={t:'f',d};return true}
 async function npm(a,o){
   const c=a[0];
   if(c==='-v'||c==='--version')return o.out('10.9.0');
@@ -357,12 +363,10 @@ function closeNano(){const d=el&&el.querySelector('.nano');if(!d)return;const t=
   d.remove();inp.focus();updPrompt()}
 
 /* ===== نقاط الدخول ===== */
-dr.querySelector('.dx').insertAdjacentHTML('beforeend',`<button data-tm="1">${ic('term2')}<span>الطرفية</span></button>`);
-dr.addEventListener('click',e=>{if(e.target.closest('[data-tm]')){e.stopImmediatePropagation();drawer(false);openTerm()}},true);
 // زر «شغّل في الطرفية» لأكواد bash داخل الدروس
 const _open=open;
 open=function(i){_open(i);let k=0;const cs=L[i].b.filter(x=>x[0]==='c');
   $('#lv').querySelectorAll('.code').forEach(c=>{const x=cs[k++];if(!x||x[1]!=='bash')return;const b=document.createElement('button');b.className='cp trm';b.innerHTML=ic('term2',14)+' شغّل';c.querySelector('.ch').appendChild(b)})};
-$('#lv').addEventListener('click',e=>{const t=e.target.closest('.trm');if(!t)return;e.stopImmediatePropagation();openTerm(t.closest('.code').querySelector('pre').textContent)},true);
-window.NXT={openTerm,run:l=>run(l),closeTerm,reset:()=>{FS=freshFS();T.cwd=HOME;T.pk=[];T.git={};saveFS();saveT2()},fs:()=>FS,T};
+$('#lv').addEventListener('click',e=>{const t=e.target.closest('.trm');if(!t)return;e.stopImmediatePropagation();const cmds=t.closest('.code').querySelector('pre').textContent;if(window.NXE)window.NXE.open(null,'html',null,{term:cmds});else openTerm(cmds)},true);
+window.NXT={openTerm,isOpen:()=>!!el,run:l=>run(l),closeTerm,reset:()=>{FS=freshFS();T.cwd=HOME;T.pk=[];T.git={};saveFS();saveT2()},fs:()=>FS,T};
 })();

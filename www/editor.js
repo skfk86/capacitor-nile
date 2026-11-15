@@ -60,7 +60,7 @@ const NAMES={html:'index.html',css:'style.css',js:'script.js',json:'config.json'
 let E=null; // {files,tab,orig,ch,lang,free}
 let ed,ta,pre,gut,ac,acItems=[],acI=0,acCtx=null;
 
-function open(code,lang,ch){
+function open(code,lang,ch,opt={}){
   close(true);
   const free=!ch&&code==null;
   const files=free?Object.assign({},FILES0,S.pgf||{}):{[lang]:code};
@@ -72,8 +72,9 @@ function open(code,lang,ch){
     <button class="eic eundo" aria-label="تراجع">${ic('back',18)}</button></div>
     ${ch?`<details class="etask" open><summary>${ic('target',16)} ${esc(ch.t)}</summary><p>${ch.d}</p></details>`:''}
     <div class="ewrap" dir="ltr"><div class="egut" aria-hidden="true"></div><div class="earea"><pre class="ehl" aria-hidden="true"></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="محرر الكود"></textarea><div class="eac" role="listbox" hidden></div></div></div>
+    <div class="etp" hidden><div class="eth" role="separator" aria-label="اسحب لتغيير الارتفاع"><i></i></div><div class="etm"></div></div>
     <div class="ekeys" dir="ltr">${['⇥','<','>','/','=','"',"'",'{','}','(',')',';',':','.','-','!'].map(k=>`<button data-ek="${k}">${k}</button>`).join('')}</div>
-    <div class="ebar">${E.orig!=null&&!ch?`<button class="eb2 ereset">${ic('back',16)} الأصل</button>`:''}${ch?`<button class="eb2 echk">${ic('check',16)} تحقق</button>`:''}${['html','css','js'].includes(lang)||free?`<button class="erun">${ic('play',18)} تشغيل</button>`:''}</div>`;
+    <div class="ebar"><button class="eb2 etg">${ic('term2',16)} الطرفية</button><span class="tsp"></span>${E.orig!=null&&!ch?`<button class="eb2 ereset">${ic('back',16)} الأصل</button>`:''}${ch?`<button class="eb2 echk">${ic('check',16)} تحقق</button>`:''}${['html','css','js'].includes(lang)||free?`<button class="erun">${ic('play',18)} تشغيل</button>`:''}</div>`;
   document.body.appendChild(ed);document.body.classList.add('pgon');
   ta=ed.querySelector('textarea');pre=ed.querySelector('.ehl');gut=ed.querySelector('.egut');ac=ed.querySelector('.eac');
   load();
@@ -83,8 +84,17 @@ function open(code,lang,ch){
   ta.addEventListener('click',()=>hideAC());
   ed.addEventListener('click',onClick);
   ac.addEventListener('pointerdown',e=>{const it=e.target.closest('[data-i]');if(it){e.preventDefault();accept(+it.dataset.i)}});
-  setTimeout(()=>ta.focus({preventScroll:true}),80);
+  ed.addEventListener('focusin',e=>ed.classList.toggle('tf',!!e.target.closest('.etp')));
+  const th=ed.querySelector('.eth');
+  th.addEventListener('pointerdown',e=>{e.preventDefault();th.setPointerCapture(e.pointerId);const panel=ed.querySelector('.etp'),bot=panel.getBoundingClientRect().bottom,max=ed.clientHeight-220;
+    const mv=ev=>{const h=Math.max(140,Math.min(max,bot-ev.clientY));panel.style.height=h+'px';S.tph=h};
+    th.addEventListener('pointermove',mv);th.addEventListener('pointerup',()=>{th.removeEventListener('pointermove',mv);sv()},{once:true})});
+  if(opt.term!=null)showTerm(opt.term);else setTimeout(()=>ta.focus({preventScroll:true}),80);
 }
+function showTerm(cmds){const panel=ed.querySelector('.etp');panel.hidden=false;panel.style.height=(S.tph||Math.round(ed.clientHeight*.42))+'px';ed.querySelector('.etg').classList.add('on');
+  window.NXT.openTerm(cmds||null,{mount:panel.querySelector('.etm'),cwd:'/data/data/com.termux/files/home'+(cmds?'':'/playground'),onClose:hideTerm})}
+function hideTerm(){if(!ed)return;const panel=ed.querySelector('.etp');panel.hidden=true;ed.classList.remove('tf');ed.querySelector('.etg').classList.remove('on');if(window.NXT.isOpen())window.NXT.closeTerm()}
+const termOn=()=>ed&&!ed.querySelector('.etp').hidden;
 function load(){ta.value=E.files[E.tab];ta.setSelectionRange(0,0);paint();ta.scrollTop=0;ta.scrollLeft=0;sync()}
 function langOf(){return E.tab}
 function paint(){
@@ -95,7 +105,7 @@ function paint(){
 }
 function sync(){pre.style.transform=`translate(${-ta.scrollLeft}px,${-ta.scrollTop}px)`;gut.style.transform=`translateY(${-ta.scrollTop}px)`;if(!ac.hidden)placeAC()}
 let raf=0;const repaint=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;paint();sync()})};
-function close(silent){if(!ed)return;hideAC();closePreview();ed.remove();ed=null;E=null;document.body.classList.remove('pgon')}
+function close(silent){if(!ed)return;hideAC();closePreview();if(termOn())hideTerm();ed.remove();ed=null;E=null;document.body.classList.remove('pgon')}
 
 /* ===================== الإدخال الذكي ===================== */
 const PAIR={'(':')','[':']','{':'}','"':'"',"'":"'",'`':'`'};
@@ -205,6 +215,7 @@ function onClick(e){
     if(v==='⇥'){if(!ac.hidden)accept(acI);else if(!expand())ins('  ')}else ins(v);return}
   if(e.target.closest('.eundo')){ta.focus();document.execCommand('undo');repaint();return}
   if(e.target.closest('.ereset')){if(confirm('استعادة الكود الأصلي؟')){ta.focus();ta.select();ins(E.orig);repaint()}return}
+  if(e.target.closest('.etg'))return termOn()?hideTerm():showTerm();
   if(e.target.closest('.erun'))return runPreview();
   if(e.target.closest('.echk'))return check();
 }
@@ -240,7 +251,9 @@ addEventListener('message',e=>{if(!pv||!e.data||!e.data.pg||e.source!==pv.queryS
 
 /* ===================== زر الرجوع ===================== */
 const prevB=window.NXB;
-window.NXB=()=>{if(ed){if(!ac.hidden){hideAC();return true}if(pv){closePreview();return true}const r=ed.querySelector('.eres');if(r){r.remove();return true}close();return true}return prevB?prevB():false};
+window.NXB=()=>{if(ed){if(!ac.hidden){hideAC();return true}if(pv){closePreview();return true}const r=ed.querySelector('.eres');if(r){r.remove();return true}if(termOn()){hideTerm();return true}close();return true}return prevB?prevB():false};
 
-window.NXE={open,hl,close};
+function files(){return E&&E.free?E.files:Object.assign({},FILES0,S.pgf||{})}
+function setFile(k,d){if(!k)return;const f=files();f[k]=d;S.pgf=Object.assign({},S.pgf||{},{[k]:d});sv();if(E&&E.free){E.files[k]=d;if(E.tab===k){const p=ta.selectionStart;ta.value=d;ta.setSelectionRange(Math.min(p,d.length),Math.min(p,d.length));paint();sync()}}}
+window.NXE={open,hl,close,files,setFile,term:c=>ed&&showTerm(c)};
 })();
