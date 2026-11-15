@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>التحقق من شهادة Capacitor Nile</title>
+<meta name="description" content="تحقق من صحة شهادات إتمام دورة Capacitor Nile الموثّقة.">
+<style>
+:root{--bg:#eef5f4;--sur:#fff;--ink:#0a2a30;--mut:#55707a;--nile:#0b7a85;--sun:#f0a81e;--ok:#2f9e6e;--bad:#d6604d}
+@media (prefers-color-scheme:dark){:root{--bg:#06171b;--sur:#0d252b;--ink:#e4f1f0;--mut:#8fb0b3;--nile:#2db3bf}}
+*{box-sizing:border-box;margin:0}
+body{font-family:"Noto Sans Arabic","IBM Plex Sans Arabic",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.8;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px}
+header{text-align:center;margin-bottom:22px}
+.sun{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;background:radial-gradient(circle at 38% 38%,#ffd877,#f0a81e 68%)}
+h1{font-size:22px}header p{color:var(--mut);font-size:14px}
+.card{width:100%;max-width:480px;background:var(--sur);border-radius:22px;padding:22px;box-shadow:0 8px 32px rgba(6,36,42,.10)}
+form{display:flex;gap:8px}
+input{flex:1;min-width:0;min-height:50px;padding:0 14px;border-radius:14px;border:1.5px solid rgba(10,42,48,.15);background:var(--bg);color:var(--ink);font:600 17px ui-monospace,monospace;letter-spacing:.06em;direction:ltr;text-align:center;text-transform:uppercase}
+button{min-height:50px;padding:0 20px;border:0;border-radius:14px;background:var(--nile);color:#fff;font:700 16px inherit;font-family:inherit;cursor:pointer}
+.res{margin-top:18px}
+.badge{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;font-weight:700;font-size:18px}
+.badge.ok{background:color-mix(in srgb,var(--ok) 14%,var(--sur));color:var(--ok)}.badge.bad{background:color-mix(in srgb,var(--bad) 13%,var(--sur));color:var(--bad)}
+.badge svg{flex:none}
+dl{margin-top:14px}dl div{display:flex;justify-content:space-between;gap:12px;padding:10px 2px;border-bottom:1px solid rgba(10,42,48,.08)}dt{color:var(--mut)}dd{font-weight:700;text-align:left;word-break:break-word}
+a{color:var(--nile)}
+.dim{color:var(--mut);font-size:13px;margin-top:14px;text-align:center}
+.spin{width:28px;height:28px;margin:18px auto;border-radius:50%;border:3px solid rgba(10,42,48,.12);border-top-color:var(--sun);animation:s 1s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
+footer{margin-top:24px;color:var(--mut);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<header><div class="sun"></div><h1>التحقق من شهادة Capacitor Nile</h1><p>شهادات إتمام موثّقة لدورة بناء تطبيقات Android</p></header>
+<main class="card">
+  <form id="f"><input id="id" placeholder="CN-XXXX-XXXX" autocomplete="off" aria-label="رقم الشهادة" maxlength="12"><button>تحقق</button></form>
+  <div class="res" id="res" aria-live="polite"></div>
+</main>
+<footer>تُصدر الشهادة بعد إتمام المحطات، والنجاح في اختبار نهائي يُصحَّح على الخادم، وبناء تطبيق حقيقي.</footer>
+<script>
+const FN='https://mouzkibnxknubbfljcqw.supabase.co/functions/v1/cert';
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const OK='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>';
+const BAD='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>';
+async function check(id){
+  id=id.trim().toUpperCase();if(!id)return;$('#id').value=id;history.replaceState(null,'','?id='+encodeURIComponent(id));
+  $('#res').innerHTML='<div class="spin"></div>';
+  try{const r=await (await fetch(FN+'?id='+encodeURIComponent(id))).json();
+    if(!r.valid){$('#res').innerHTML=`<div class="badge bad">${BAD} لا توجد شهادة بهذا الرقم</div><p class="dim">تأكد من كتابة الرقم كما هو في الشهادة.</p>`;return}
+    const d=new Date(r.issued_at).toLocaleDateString('ar',{year:'numeric',month:'long',day:'numeric'});
+    $('#res').innerHTML=`<div class="badge ok">${OK} شهادة صحيحة وموثّقة</div><dl>
+      <div><dt>الاسم</dt><dd>${esc(r.name)}</dd></div>
+      <div><dt>رقم الشهادة</dt><dd dir="ltr">${esc(r.id)}</dd></div>
+      <div><dt>تاريخ الإصدار</dt><dd>${d}</dd></div>
+      <div><dt>نتيجة الاختبار النهائي</dt><dd>${r.score}%</dd></div>
+      <div><dt>حساب GitHub</dt><dd dir="ltr"><a href="https://github.com/${esc(r.login)}" rel="noopener">@${esc(r.login)}</a></dd></div>
+      <div><dt>التطبيق الذي بناه</dt><dd><a href="${esc(r.repo_url)}" rel="noopener">المستودع</a>${r.apk_url?` · <a href="${esc(r.apk_url)}" rel="noopener">APK</a>`:''}</dd></div>
+    </dl><p class="dim">الدورة: Capacitor Nile — HTML وCSS وJavaScript وCapacitor وGitHub Actions</p>`;
+  }catch(e){$('#res').innerHTML=`<div class="badge bad">${BAD} تعذّر الاتصال، حاول لاحقاً</div>`}
+}
+$('#f').onsubmit=e=>{e.preventDefault();check($('#id').value)};
+const q=new URLSearchParams(location.search).get('id');if(q)check(q);
+</script>
+</body>
+</html>

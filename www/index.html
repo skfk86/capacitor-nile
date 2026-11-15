@@ -426,6 +426,27 @@ article h3{margin-top:26px;font-size:calc(19px * var(--fz,1))}
 .nty input:checked{background:var(--nile)}.nty input:checked::after{inset-inline-start:21px}
 .nprev{margin-top:10px;padding:10px 12px;border-radius:14px;background:var(--bg);font-size:13.5px}.nprev b{display:block}
 .tx2{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;color:#9fb3ba}
+
+/* ===== الشهادة الموثّقة ===== */
+.czh{display:flex;align-items:center;gap:14px;padding:16px;margin-bottom:12px;border-radius:20px;background:linear-gradient(135deg,#0b7a85,#063a42);color:#fff}.czh div{display:flex;flex-direction:column}.czh small{opacity:.85}.czh svg{color:var(--sun)}
+.creq{list-style:none;padding:0;margin:8px 0 14px}.creq li{display:flex;gap:12px;align-items:flex-start;padding:12px 4px;border-bottom:1px solid var(--line);color:var(--mut)}.creq li svg{flex:none;margin-top:4px}.creq li span{display:flex;flex-direction:column}.creq b{color:var(--ink)}.creq small{font-size:13px}.creq li.y{color:#2f9e6e}
+.cz .go:disabled{opacity:.45;box-shadow:none}
+.czm{text-align:center;min-height:1.6em}
+.czimg{display:block;width:100%;border-radius:16px;box-shadow:var(--sh2);margin-bottom:14px}
+.czid{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin-bottom:12px;border-radius:14px;background:var(--sur);border:1px solid var(--line)}.czid span{color:var(--mut)}.czid b{font-size:18px;letter-spacing:.06em;color:var(--nile)}
+.cz .go{margin-bottom:10px}
+#exam{position:fixed;inset:0;z-index:48;display:flex;flex-direction:column;background:var(--bg)}
+.xb{display:flex;align-items:center;gap:8px;padding:calc(max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)) + 8px) 10px 8px;background:var(--sur);border-bottom:1px solid var(--line)}
+#exam .eic{color:var(--mut)}
+.xt2{font:700 17px ui-monospace,monospace;padding:4px 12px;border-radius:10px;background:var(--bg);direction:ltr}.xt2.low{color:#fff;background:#d6604d;animation:pulse 1s infinite}
+.xp{height:4px;background:var(--line)}.xp i{display:block;height:100%;background:var(--sun);transition:width .3s}
+.xbody{flex:1;overflow:auto;padding:20px}.xbody small{color:var(--mut)}.xbody h2{font-size:20px;line-height:1.7;margin:6px 0 18px}
+.qo.sel{border-color:var(--nile);background:color-mix(in srgb,var(--nile) 14%,var(--sur))}.qo.sel i{background:var(--nile);color:#fff}
+.xdots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 14px}.xdots button{width:30px;height:30px;border-radius:9px;font-size:12px;background:var(--sur);border:1px solid var(--line);color:var(--mut)}.xdots .a{background:color-mix(in srgb,var(--nile) 18%,var(--sur));color:var(--ink)}.xdots .on{border:2px solid var(--sun)}
+.xnav{display:flex;gap:10px;align-items:center;padding:10px 16px calc(max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)) + 12px);background:var(--sur);border-top:1px solid var(--line)}.xnav .go{width:auto;min-width:140px;padding:0 22px;margin:0}
+#exam .eb2{background:var(--bg);color:var(--ink)}#exam .eb2:disabled{opacity:.4}
+.xres{margin:auto;padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}.xres h2{font-size:24px}.xres p{color:var(--mut)}.xres.ok svg{color:var(--sun)}.xres.bad svg{color:#d6604d}.xres .go{width:auto;padding:0 32px;margin-top:10px}
+.spn.big{width:44px;height:44px;border-width:4px}
 /* ===== مشروعي ===== */
 .pjcard{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:20px 20px 0;padding:14px 16px;text-align:start;background:var(--sur);border:1px solid var(--line);border-radius:20px}
 .pjcard>span:nth-child(2){flex:1;display:flex;flex-direction:column;line-height:1.5}.pjcard small,.pjadd small{color:var(--mut);font-size:12px}.pjcard em{font-style:normal;font-size:13px;color:var(--nile)}
@@ -775,5 +796,7 @@ prefs();tab(0);render();setTimeout(adsInit,600);
 <script src="terminal.js"></script>
 <script src="editor.js"></script>
 <script src="notify.js"></script>
+<script src="qr.js"></script>
+<script src="cert.js"></script>
 </body>
 </html>
