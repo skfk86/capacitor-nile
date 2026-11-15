@@ -95,15 +95,30 @@ function showTerm(cmds){const panel=ed.querySelector('.etp');panel.hidden=false;
   window.NXT.openTerm(cmds||null,{mount:panel.querySelector('.etm'),cwd:'/data/data/com.termux/files/home'+(cmds?'':'/playground'),onClose:hideTerm})}
 function hideTerm(){if(!ed)return;const panel=ed.querySelector('.etp');panel.hidden=true;ed.classList.remove('tf');ed.querySelector('.etg').classList.remove('on');if(window.NXT.isOpen())window.NXT.closeTerm()}
 const termOn=()=>ed&&!ed.querySelector('.etp').hidden;
-function load(){ta.value=E.files[E.tab];ta.setSelectionRange(0,0);paint();ta.scrollTop=0;ta.scrollLeft=0;sync()}
+function load(){lastV=null;pre._k=null;LH=0;ta.value=E.files[E.tab];ta.setSelectionRange(0,0);paint();ta.scrollTop=0;ta.scrollLeft=0;sync()}
 function langOf(){return E.tab}
+// عرض افتراضي: نلوّن النص كاملاً (سريع) لكن نرسم في الصفحة الأسطر الظاهرة فقط
+let LINES=[],lastV=null,lastL=null,LH=0,PADT=0;
+function splitHL(h){const out=[];let cur='',open='';const re=/(<span class="[^"]*">)|(<\/span>)|(\n)|([^<\n]+|<)/g;let m;
+  while((m=re.exec(h))){if(m[1]){open=m[1];cur+=m[1]}else if(m[2]){open='';cur+=m[2]}else if(m[3]){out.push(open?cur+'</span>':cur);cur=open}else cur+=m[4]}
+  out.push(cur);return out}
 function paint(){
-  const v=ta.value;pre.innerHTML=hl(v,langOf())+'\n ';
-  const n=v.split('\n').length;if(gut._n!==n){gut.innerHTML=Array.from({length:n},(_,i)=>`<span>${i+1}</span>`).join('');gut._n=n}
-  E.files[E.tab]=v;
-  if(E.free){S.pgf=E.files;sv()}else if(E.ch)window.NX.saveCh(E.ch,v);
+  const v=ta.value,L=langOf();
+  if(v!==lastV||L!==lastL){LINES=splitHL(hl(v,L));lastV=v;lastL=L;
+    E.files[E.tab]=v;if(E.free){S.pgf=E.files;sv()}else if(E.ch)window.NX.saveCh(E.ch,v)}
+  if(!LH){const cs=getComputedStyle(ta);LH=parseFloat(cs.lineHeight);PADT=parseFloat(cs.paddingTop)}
+  draw();
 }
-function sync(){pre.style.transform=`translate(${-ta.scrollLeft}px,${-ta.scrollTop}px)`;gut.style.transform=`translateY(${-ta.scrollTop}px)`;if(!ac.hidden)placeAC()}
+function draw(){
+  const n=LINES.length,top=ta.scrollTop,h=ta.clientHeight||600;
+  const a=Math.max(0,Math.floor((top-PADT)/LH)-15),b=Math.min(n,Math.ceil((top+h)/LH)+15);
+  const key=a+':'+b+':'+lastV.length+':'+(lastV===pre._v);
+  if(pre._k!==key||pre._v!==lastV){pre.innerHTML=LINES.slice(a,b).join('\n')+'\n ';pre._k=key;pre._v=lastV;pre._a=a
+    gut.innerHTML=Array.from({length:b-a},(_,i)=>`<span>${a+i+1}</span>`).join('');gut.style.minWidth=(String(n).length*9+22)+'px'}
+  const off=pre._a*LH-top;
+  pre.style.transform=`translate(${-ta.scrollLeft}px,${off}px)`;gut.style.transform=`translateY(${off}px)`;
+}
+function sync(){if(lastV==null)return;draw();if(!ac.hidden)placeAC()}
 let raf=0;const repaint=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;paint();sync()})};
 function close(silent){if(!ed)return;hideAC();closePreview();if(termOn())hideTerm();ed.remove();ed=null;E=null;document.body.classList.remove('pgon')}
 
