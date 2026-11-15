@@ -416,6 +416,15 @@ article h3{margin-top:26px;font-size:calc(19px * var(--fz,1))}
 #ed.tf .ekeys{display:none}
 .etg.on{background:#24414c;color:#7ee2a8}
 .ebar .tsp{flex:1}
+.obs2{display:block;margin:6px auto 0;min-height:44px;color:#cfe8e8}
+#ob svg[width="40"]{display:block;margin:0 auto;color:var(--sun)}
+.nty{display:flex;flex-direction:column;gap:2px;margin-top:10px}
+.nty label{display:flex;align-items:center;gap:12px;min-height:48px;padding:4px 2px;border-top:1px solid var(--line)}
+.nty label span{flex:1;display:flex;flex-direction:column;line-height:1.4}.nty small{color:var(--mut);font-size:12.5px}
+.nty input{appearance:none;flex:none;width:46px;height:28px;border-radius:99px;background:var(--line);position:relative;transition:background .2s;cursor:pointer}
+.nty input::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:inset-inline-start .2s}
+.nty input:checked{background:var(--nile)}.nty input:checked::after{inset-inline-start:21px}
+.nprev{margin-top:10px;padding:10px 12px;border-radius:14px;background:var(--bg);font-size:13.5px}.nprev b{display:block}
 /* ===== مشروعي ===== */
 .pjcard{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:20px 20px 0;padding:14px 16px;text-align:start;background:var(--sur);border:1px solid var(--line);border-radius:20px}
 .pjcard>span:nth-child(2){flex:1;display:flex;flex-direction:column;line-height:1.5}.pjcard small,.pjadd small{color:var(--mut);font-size:12px}.pjcard em{font-style:normal;font-size:13px;color:var(--nile)}
@@ -764,5 +773,6 @@ prefs();tab(0);render();setTimeout(adsInit,600);
 <script src="project.js"></script>
 <script src="terminal.js"></script>
 <script src="editor.js"></script>
+<script src="notify.js"></script>
 </body>
 </html>
