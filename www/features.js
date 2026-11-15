@@ -48,7 +48,7 @@ function playground(code,lang,ch){
   el.innerHTML=`<div class="bar"><button class="bk pgx" aria-label="إغلاق">${ic('x')}</button><span class="bt">${ch?esc(ch.t):'ملعب الكود · '+lang.toUpperCase()}</span></div>
   ${ch?`<div class="chd"><p>${ch.d}</p></div>`:''}
   <div class="pgw${live?'':' nolive'}"><textarea spellcheck="false" autocapitalize="off" autocomplete="off" dir="ltr" aria-label="الكود">${esc(code)}</textarea>
-  ${live?`<div class="phn"><iframe sandbox="allow-scripts allow-modals" title="المعاينة"></iframe></div><pre class="plog" dir="ltr"></pre>`:''}</div>
+  ${live?`<div class="phn"><iframe sandbox="allow-scripts allow-modals allow-forms" title="المعاينة"></iframe></div><pre class="plog" dir="ltr"></pre>`:''}</div>
   <div class="pga">${ch?`<button class="go pgc">${ic('check',18)} تحقق من الحل</button><ul class="chk"></ul>`:`<button class="go2 pgr">${ic('back',16)} استعادة الكود الأصلي</button>`}</div>`;
   document.body.appendChild(el);document.body.classList.add('pgon');
   const ta=el.querySelector('textarea'),fr=el.querySelector('iframe'),lg=el.querySelector('.plog');
@@ -256,6 +256,7 @@ function onboard(){
   draw();document.body.appendChild(el);
 }
 
+window.NX={toast,esc,addXP,quizHTML,playground};
 prefs();render();
 if(!S.ob)onboard();
 })();
