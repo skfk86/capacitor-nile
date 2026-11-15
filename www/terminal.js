@@ -1,7 +1,7 @@
 // طرفية محاكاة على طريقة Termux: نظام ملفات افتراضي، أوامر حقيقية الشكل، ومشروع المتعلم بداخلها
 (()=>{
 const {toast,esc,addXP}=window.NX;
-Object.assign(IC,{term2:'<polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/>'});
+Object.assign(IC,{max:'<path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/>',term2:'<polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/>'});
 const HOME='/data/data/com.termux/files/home',PRJ=HOME+'/my-nile-app',PG=HOME+'/playground';
 const PGF={'index.html':'html','style.css':'css','script.js':'js'};
 const inPG=p=>p===PG||p.startsWith(PG+'/');
@@ -68,7 +68,7 @@ function openTerm(cmds,opt={}){
   if(el){if(opt.cwd&&node(opt.cwd)){T.cwd=opt.cwd;updPrompt()}if(cmds)feed(cmds);return}
   OPT=opt;if(opt.cwd&&node(opt.cwd))T.cwd=opt.cwd;
   el=document.createElement('div');el.id='term';el.setAttribute('aria-label','الطرفية');if(opt.mount)el.className='emb';else{el.setAttribute('role','dialog');el.setAttribute('aria-modal','true')}
-  el.innerHTML=`<div class="tbar"><button class="tx" aria-label="إغلاق">${ic(opt.mount?'back':'x',opt.mount?16:20)}</button><b dir="ltr">${opt.mount?'TERMINAL':'Termux · Nile'}</b><span class="tsp"></span><button class="thelp">help</button></div>
+  el.innerHTML=`<div class="tbar"><button class="tx" aria-label="إغلاق">${ic(opt.mount?'back':'x',opt.mount?16:20)}</button><b dir="ltr">${opt.mount?'TERMINAL':'Termux · Nile'}</b><span class="tsp"></span>${opt.mount?`<button class="tx2 tfull" aria-label="ملء الشاشة">${ic('max',16)}</button>`:''}<button class="thelp">help</button></div>
   <div class="tout" dir="ltr" aria-live="polite"></div>
   <div class="tin" dir="ltr"><span class="tpr"></span><div class="tiw"><div class="tih" aria-hidden="true"></div><input autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="send" aria-label="اكتب أمراً"></div></div>
   <div class="tkeys" dir="ltr">${['ESC','CTRL','TAB','↑','↓','←','→','/','-','|','~','.'].map(k=>`<button data-k="${k}">${k}</button>`).join('')}</div>`;
@@ -93,6 +93,7 @@ function nextQ(){if(queue.length){inp.value=queue.shift();inp.focus();inp.setSel
 function onClick(e){
   if(e.target.closest('.tx'))return closeTerm();
   if(e.target.closest('.thelp')){run('help');return}
+  if(e.target.closest('.tfull')){closeTerm();setTimeout(()=>openTerm(null),0);return}
   const k=e.target.closest('[data-k]');if(!k)return;e.preventDefault();
   const v=k.dataset.k;
   if(v==='CTRL'){ctrl=!ctrl;k.classList.toggle('on',ctrl)}
@@ -368,5 +369,7 @@ const _open=open;
 open=function(i){_open(i);let k=0;const cs=L[i].b.filter(x=>x[0]==='c');
   $('#lv').querySelectorAll('.code').forEach(c=>{const x=cs[k++];if(!x||x[1]!=='bash')return;const b=document.createElement('button');b.className='cp trm';b.innerHTML=ic('term2',14)+' شغّل';c.querySelector('.ch').appendChild(b)})};
 $('#lv').addEventListener('click',e=>{const t=e.target.closest('.trm');if(!t)return;e.stopImmediatePropagation();const cmds=t.closest('.code').querySelector('pre').textContent;if(window.NXE)window.NXE.open(null,'html',null,{term:cmds});else openTerm(cmds)},true);
+dr.querySelector('.dx').insertAdjacentHTML('beforeend',`<button data-tm="1">${ic('term2')}<span>الطرفية</span></button>`);
+dr.addEventListener('click',e=>{if(e.target.closest('[data-tm]')){e.stopImmediatePropagation();drawer(false);openTerm(null,{cwd:HOME})}},true);
 window.NXT={openTerm,isOpen:()=>!!el,run:l=>run(l),closeTerm,reset:()=>{FS=freshFS();T.cwd=HOME;T.pk=[];T.git={};saveFS();saveT2()},fs:()=>FS,T};
 })();
