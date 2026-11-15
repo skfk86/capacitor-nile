@@ -345,6 +345,7 @@ open=function(i){_open(i);const f=FEAT.find(x=>x.i===i);if(!f)return;
   $('#lv article').insertAdjacentHTML('beforeend',`<div class="pjadd"><span class="pje" style="background:${P.color}">${P.emoji}</span><span><small>${has(i)?'في مشروعك':'أنهِ المحطة لتضيف إلى مشروعك'}</small><b>${f.t}</b></span><button class="pjgo">افتح</button></div>`)};
 $('#lv').addEventListener('click',e=>{if(e.target.closest('.pjgo')){e.stopImmediatePropagation();history.back();setTimeout(pgProject,420)}},true);
 
+window.NXP={genApp,files,iconB64};
 AC.push(['hammer','أول APK','بنيت تطبيقك الأول من داخل التطبيق',()=>!!S.built]);
 render();
 })();
