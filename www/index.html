@@ -318,6 +318,11 @@ article h3{margin-top:26px;font-size:calc(19px * var(--fz,1))}
 .top h1{font-size:28px}
 .seg button{transition:background .2s,color .2s}
 
+.sbx{display:none;position:sticky;top:0;z-index:2;padding:calc(max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)) + 10px) 20px 10px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.sbx.on{display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:center;animation:tabIn .25s var(--ease)}
+.sbx #gres{grid-column:1/-1}
+.sbx-x{min-height:44px;color:var(--nile);font-weight:700}
+.sbt{inset-inline-start:auto!important;inset-inline-end:16px}
 /* ===== مشروعي ===== */
 .pjcard{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:20px 20px 0;padding:14px 16px;text-align:start;background:var(--sur);border:1px solid var(--line);border-radius:20px}
 .pjcard>span:nth-child(2){flex:1;display:flex;flex-direction:column;line-height:1.5}.pjcard small,.pjadd small{color:var(--mut);font-size:12px}.pjcard em{font-style:normal;font-size:13px;color:var(--nile)}

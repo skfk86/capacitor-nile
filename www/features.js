@@ -123,6 +123,13 @@ const IDX=L.map(l=>(l.t+' '+l.s+' '+l.b.map(x=>x[0]==='u'?x[1].join(' '):x[0]===
 const sb=document.createElement('div');sb.className='sbx';
 sb.innerHTML=`<label class="sw">${ic('search',18)}<input class="srch" id="lq" type="search" placeholder="ابحث في الدروس والمصطلحات…" aria-label="بحث"></label><div id="gres"></div>`;
 $('#route').before(sb);
+const sbt=document.querySelector('.hb .sp');
+if(sbt){const b=document.createElement('button');b.className='mb sbt';b.setAttribute('aria-label','بحث');b.innerHTML=ic('search',20);sbt.replaceWith(b);
+  b.onclick=()=>{const on=!sb.classList.contains('on');sb.classList.toggle('on',on);
+    if(on){sb.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('#lq').focus({preventScroll:true}),350)}
+    else{$('#lq').value='';$('#lq').dispatchEvent(new Event('input'))}}}
+sb.querySelector('.sw').insertAdjacentHTML('afterend','<button class="sbx-x" aria-label="إغلاق البحث">إلغاء</button>');
+sb.querySelector('.sbx-x').onclick=()=>document.querySelector('.sbt').click();
 $('#lq').addEventListener('input',e=>{
   const q=e.target.value.trim().toLowerCase();let n=0;
   document.querySelectorAll('#route .st').forEach(s=>{const m=!q||IDX[+s.dataset.i].includes(q);s.hidden=!m;if(m)n++});
