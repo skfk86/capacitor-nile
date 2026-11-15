@@ -20,7 +20,7 @@ async function pgCert(){
   if(S.cert)return showCert(S.cert);
   const allDone=done.length===L.length,tk=TK();
   sheet('الشهادة الموثّقة',`<div class="cz">
-    <div class="czh">${ic('shield',30)}<div><b>شهادة إتمام موثّقة</b><small>يمكن لأي شخص التحقق منها برمز QR</small></div></div>
+    <div class="czh">${ic('shield',30)}<div><b>شهادة إتمام موثّقة</b><small>تصدرها ${ISSUER.ar} · يمكن لأي شخص التحقق منها</small></div></div>
     <p class="pi">لضمان قيمتها، لا تُمنح الشهادة إلا بعد ثلاثة شروط:</p>
     <ul class="creq">
       <li class="${allDone?'y':''}">${ic(allDone?'check':'lock',18)}<span><b>أنهِ كل المحطات</b><small>${done.length} من ${L.length}</small></span></li>
@@ -103,25 +103,65 @@ function closeExam(){const el=document.getElementById('exam');if(el)el.remove();
 const prevB=window.NXB;window.NXB=()=>{if(document.getElementById('exam')){if(X&&!sending){if(confirm('الخروج يُنهي المحاولة وتُحتسب. متأكد؟'))submit(true)}else closeExam();return true}return prevB?prevB():false};
 
 /* ===== رسم الشهادة ===== */
+// اسم الجهة المانحة وموقّع الشهادة — غيّرهما من هنا فقط
+const ISSUER={ar:'أكاديمية مبرمج سوداني',en:'SUDANESE DEVELOPER ACADEMY',signer:'علوش',role:'المؤسس والمدرّب'};
 function render(c){
-  const cv=document.createElement('canvas');cv.width=1080;cv.height=1440;const x=cv.getContext('2d');
-  const g=x.createLinearGradient(0,0,0,1440);g.addColorStop(0,'#041f25');g.addColorStop(1,'#0b5c66');x.fillStyle=g;x.fillRect(0,0,1080,1440);
-  x.strokeStyle='rgba(240,168,30,.75)';x.lineWidth=6;x.strokeRect(40,40,1000,1360);x.strokeStyle='rgba(240,168,30,.3)';x.lineWidth=2;x.strokeRect(58,58,964,1324);
-  x.fillStyle='#f0a81e';x.beginPath();x.arc(540,190,62,0,7);x.fill();
-  x.direction='rtl';x.textAlign='center';
-  const T=(t,y,s,w=400,col='#fff')=>{x.fillStyle=col;x.font=`${w} ${s}px "Noto Sans Arabic","IBM Plex Sans Arabic",system-ui,sans-serif`;x.fillText(t,540,y)};
-  T('شهادة إتمام موثّقة',330,64,700,'#f0a81e');
-  x.direction='ltr';T('Capacitor Nile',405,44,700,'#cfe8e8');x.direction='rtl';
-  T('تشهد منصة Capacitor Nile بأن',505,36,400,'#cfe8e8');
-  T(c.name,610,84,700,'#ffd877');
-  T('أتمّ دورة بناء تطبيقات Android بنجاح',700,40,400);
-  T('HTML وCSS وJavaScript وCapacitor وGitHub Actions',760,32,400,'#cfe8e8');
-  T(`اجتاز الاختبار النهائي بنسبة ${c.score}% وبنى تطبيقاً حقيقياً`,840,32,700,'#fff');
-  x.direction='ltr';T('github.com/'+c.login+'/my-nile-app',892,28,400,'#9fd3d6');x.direction='rtl';
-  T(fmtDate(c.issued_at),950,32,400,'#cfe8e8');
-  QR.draw(x,VERIFY+c.id,400,990,280,'#041f25','#ffffff');
-  x.direction='ltr';T(c.id,1320,40,700,'#ffd877');x.direction='rtl';
-  T('امسح الرمز أو أدخل الرقم للتحقق من صحة الشهادة',1372,24,400,'#9fd3d6');
+  const W=1754,H=1240,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
+  const TEAL='#06424a',GOLD='#b8862b',GOLD2='#e2b04a',INK='#1d2b2e',MUT='#5d6f72';
+  const F=(w,s,f='"Noto Sans Arabic","IBM Plex Sans Arabic",system-ui,sans-serif')=>`${w} ${s}px ${f}`;
+  const T=(t,px,py,font,col=INK,al='center',dir='rtl')=>{x.direction=dir;x.textAlign=al;x.font=font;x.fillStyle=col;x.fillText(t,px,py)};
+  // الخلفية والزخرفة
+  x.fillStyle='#fbf8f1';x.fillRect(0,0,W,H);
+  x.save();x.globalAlpha=.07;x.strokeStyle=TEAL;x.lineWidth=1;
+  for(let k=0;k<26;k++){x.beginPath();for(let t=0;t<=W;t+=6){const yy=70+Math.sin(t/38+k*.45)*14+k*.8;t?x.lineTo(t,yy):x.moveTo(t,yy)}x.stroke();x.beginPath();for(let t=0;t<=W;t+=6){const yy=H-70+Math.sin(t/38+k*.45)*14-k*.8;t?x.lineTo(t,yy):x.moveTo(t,yy)}x.stroke()}
+  x.restore();
+  // علامة مائية
+  x.save();x.globalAlpha=.045;x.translate(W/2,H/2+40);x.strokeStyle=TEAL;x.lineWidth=3;for(let r=60;r<=300;r+=24){x.beginPath();x.arc(0,0,r,0,7);x.stroke()}
+  for(let a=0;a<48;a++){x.rotate(Math.PI/24);x.beginPath();x.moveTo(60,0);x.lineTo(300,0);x.stroke()}x.restore();
+  // الإطار
+  x.strokeStyle=TEAL;x.lineWidth=18;x.strokeRect(30,30,W-60,H-60);
+  x.strokeStyle=GOLD;x.lineWidth=3;x.strokeRect(56,56,W-112,H-112);x.lineWidth=1;x.strokeRect(64,64,W-128,H-128);
+  [[64,64],[W-64,64],[64,H-64],[W-64,H-64]].forEach(([a,b])=>{x.fillStyle=GOLD;x.beginPath();x.moveTo(a,b-14);x.lineTo(a+14,b);x.lineTo(a,b+14);x.lineTo(a-14,b);x.closePath();x.fill()});
+  // شعار الجهة
+  const ex=W/2,ey=165;x.fillStyle=TEAL;x.beginPath();x.arc(ex,ey,62,0,7);x.fill();x.strokeStyle=GOLD2;x.lineWidth=4;x.beginPath();x.arc(ex,ey,70,0,7);x.stroke();
+  x.fillStyle=GOLD2;x.beginPath();x.arc(ex,ey-8,22,Math.PI,0);x.fill();x.fillRect(ex-34,ey+2,68,4);
+  T('</>',ex,ey+40,F(700,24,'ui-monospace,monospace'),'#fff','center','ltr');
+  T(ISSUER.ar,W/2,282,F(700,40),TEAL);
+  T(ISSUER.en,W/2,318,F(600,17,'Georgia,"Times New Roman",serif'),GOLD,'center','ltr');
+  // العنوان
+  T('شهادة إتمام',W/2,410,F(700,74),INK);
+  T('CERTIFICATE OF COMPLETION  ·  VERIFIED',W/2,452,F(600,20,'Georgia,"Times New Roman",serif'),MUT,'center','ltr');
+  x.strokeStyle=GOLD;x.lineWidth=2;x.beginPath();x.moveTo(W/2-220,478);x.lineTo(W/2+220,478);x.stroke();
+  T(`تشهد ${ISSUER.ar} بأن`,W/2,540,F(400,32),MUT);
+  T(c.name,W/2,630,F(700,78),TEAL);
+  x.strokeStyle='rgba(6,66,74,.25)';x.lineWidth=1.5;x.beginPath();x.moveTo(W/2-360,660);x.lineTo(W/2+360,660);x.stroke();
+  T('قد أتمّ بنجاح دورة «بناء تطبيقات Android بتقنية Capacitor»',W/2,725,F(500,34),INK);
+  const hrs=Math.max(1,Math.round(L.reduce((a,l)=>a+l.m,0)/60));
+  T(`${L.length} محطة تعليمية  ·  نحو ${hrs} ساعات  ·  نتيجة الاختبار النهائي ${c.score}%  ·  تطبيق حقيقي منشور`,W/2,780,F(500,25),MUT);
+  T('HTML  ·  CSS  ·  JavaScript  ·  Capacitor  ·  Git & GitHub  ·  GitHub Actions CI/CD',W/2,825,F(600,21,'Georgia,"Times New Roman",serif'),GOLD,'center','ltr');
+  // التوقيع (يمين)
+  const sx=W-330,by=1010;
+  T(ISSUER.signer,sx,by-22,F(400,46,'"Segoe Script","Brush Script MT","Noto Sans Arabic",cursive'),TEAL);
+  x.strokeStyle=INK;x.lineWidth=1.5;x.beginPath();x.moveTo(sx-170,by);x.lineTo(sx+170,by);x.stroke();
+  T(ISSUER.role,sx,by+36,F(600,22),INK);T(ISSUER.ar,sx,by+68,F(400,19),MUT);
+  // الختم (وسط)
+  const cx=W/2,cy=960;
+  x.fillStyle=GOLD2;x.beginPath();for(let i=0;i<48;i++){const a=i/48*Math.PI*2,r=i%2?92:102;x.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r)}x.closePath();x.fill();
+  x.fillStyle='#fbf3df';x.beginPath();x.arc(cx,cy,80,0,7);x.fill();x.strokeStyle=GOLD;x.lineWidth=2;x.beginPath();x.arc(cx,cy,72,0,7);x.stroke();x.beginPath();x.arc(cx,cy,52,0,7);x.stroke();
+  x.save();x.translate(cx,cy);x.font=F(700,12,'Georgia,serif');x.fillStyle=GOLD;x.direction='ltr';x.textAlign='center';
+  const ring='VERIFIED  •  CERTIFIED COMPLETION  •  ';const n=ring.length;for(let i=0;i<n;i++){x.save();x.rotate(i/n*Math.PI*2);x.fillText(ring[i],0,-58);x.restore()}x.restore();
+  T('موثّقة',cx,cy+4,F(700,26),TEAL);T(new Date(c.issued_at).getFullYear()+'',cx,cy+30,F(700,16,'Georgia,serif'),GOLD,'center','ltr');
+  // التحقق (يسار)
+  const qx=150,qy=850,qs=190;x.fillStyle='#fff';x.fillRect(qx-8,qy-8,qs+16,qs+16);x.strokeStyle='rgba(6,66,74,.25)';x.lineWidth=1;x.strokeRect(qx-8,qy-8,qs+16,qs+16);
+  QR.draw(x,VERIFY+c.id,qx,qy,qs,INK,'#ffffff');
+  T('رقم الشهادة',qx+qs+24,qy+40,F(400,19),MUT,'left');
+  T(c.id,qx+qs+24,qy+78,F(700,30,'ui-monospace,Menlo,monospace'),TEAL,'left','ltr');
+  T('تاريخ الإصدار',qx+qs+24,qy+122,F(400,19),MUT,'left');
+  T(fmtDate(c.issued_at),qx+qs+24,qy+156,F(600,22),INK,'left');
+  // التذييل
+  T(`المشروع العملي: github.com/${c.login}/my-nile-app`,W/2,H-148,F(400,18),MUT);
+  T('للتحقق من صحة الشهادة امسح الرمز أو افتح الرابط التالي وأدخل رقمها',W/2,H-118,F(400,18),MUT);
+  T(`skfk86.github.io/capacitor-nile/docs/verify.html   ·   sig ${String(c.sig||'').slice(0,12)}`,W/2,H-90,F(500,17,'ui-monospace,Menlo,monospace'),TEAL,'center','ltr');
   return cv;
 }
 function showCert(c,replace){
@@ -135,7 +175,7 @@ function showCert(c,replace){
 }
 async function shareCert(){const c=S.cert;if(!c)return;const cv=render(c);
   cv.toBlob(async b=>{const f=new File([b],'nile-certificate-'+c.id+'.png',{type:'image/png'});const FS=plug('Filesystem'),SH=plug('Share');
-    const text=`حصلت على شهادة Capacitor Nile الموثّقة! تحقق منها: ${VERIFY+c.id}`;
+    const text=`حصلت على شهادة إتمام موثّقة من أكاديمية مبرمج سوداني في بناء تطبيقات Android! تحقق منها: ${VERIFY+c.id}`;
     if(FS&&SH){try{const data=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.readAsDataURL(b)});const w=await FS.writeFile({path:f.name,data,directory:'CACHE'});await SH.share({title:'شهادتي',text,files:[w.uri]});return}catch(e){if(/cancel/i.test((e&&e.message)||''))return}}
     try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text});return}}catch(e){if(e&&e.name==='AbortError')return}
     const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove()})}
