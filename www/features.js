@@ -42,6 +42,7 @@ const LOG=`<script>(()=>{const p=(t,a)=>parent.postMessage({pg:1,t,m:a.map(x=>{t
 const doc=(code,lang)=>{const h=(WRAP[lang]||WRAP.html)(code);return /<head[^>]*>/i.test(h)?h.replace(/<head[^>]*>/i,m=>m+LOG):LOG+h};
 let pgo=null;
 function playground(code,lang,ch){
+  if(window.NXE)return window.NXE.open(code,lang,ch);
   close2();
   const el=document.createElement('div');el.id='pgd';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
   const live=lang==='html'||lang==='css'||lang==='js';
@@ -75,6 +76,9 @@ const CH=[
 {t:'تحدي: الأتمتة الكاملة',lang:'yaml',d:'أكمل خطوات الـ job: جهّز Node، ثبّت الحزم، أضف Android إن لم يوجد، زامن، ثم ارفع الـ APK كـ Artifact.',s:'    steps:\n      - uses: actions/checkout@v4\n',c:[['actions/setup-node',has(/actions\/setup-node@/)],['npm install أو npm ci',has(/npm\s+(install|ci)\b/)],['npx cap add android',has(/cap\s+add\s+android/)],['npx cap sync',has(/cap\s+sync/)],['actions/upload-artifact',has(/actions\/upload-artifact@/)]]},
 {t:'تحدي: الأتمتة المتقدمة',lang:'yaml',d:'اكتب workflow فيه: محفز وسم <code>v*</code>، وjob فحص <code>check</code> يسبق job <code>build</code> عبر <code>needs</code>، وكاش لـ Gradle، وقراءة السر <code>KS_PASS</code>.',s:'name: Release\non:\n',c:[["محفز tags: ['v*']",has(/tags:\s*\[?\s*['"]v\*['"]/)],['job باسم check',has(/^\s{2}check:/m)],['needs: check',has(/needs:\s*\[?\s*check/)],['actions/cache',has(/actions\/cache@/)],['secrets.KS_PASS',has(/\$\{\{\s*secrets\.KS_PASS\s*\}\}/)]]}
 ];
+function chk(ch,code){const r=ch.c.map(([l,f])=>[l,!!f(code)]),all=r.every(x=>x[1]);
+  if(all){const k=CH.indexOf(ch);if(!S.ch[k]){S.ch[k]=1;addXP(20,'تحدٍّ مكتمل')}else toast('حل صحيح!');confetti&&confetti()}else toast('بقيت شروط لم تتحقق');return r}
+const saveCh=(ch,code)=>{S['cd'+CH.indexOf(ch)]=code;sv()};
 function checkCh(){
   const {ch,ta,el}=pgo,code=ta.value,r=ch.c.map(([l,f])=>[l,!!f(code)]),all=r.every(x=>x[1]);
   el.querySelector('.chk').innerHTML=r.map(([l,o])=>`<li class="${o?'y':'n'}">${ic(o?'check':'x',16)} ${esc(l)}</li>`).join('');
@@ -225,7 +229,7 @@ $('#sets').addEventListener('click',async e=>{
 /* ===== القائمة الجانبية ===== */
 dr.insertAdjacentHTML('beforeend',`<div class="dx"><button data-x="gl">${ic('dict')}<span>مسرد المصطلحات</span></button><button data-x="pg">${ic('code')}<span>ملعب الكود</span></button></div>`);
 dr.addEventListener('click',e=>{const b=e.target.closest('[data-x]');if(!b)return;e.stopImmediatePropagation();drawer(false);
-  if(b.dataset.x==='gl')pgGloss();else playground('<!doctype html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta name="viewport" content="width=device-width,initial-scale=1">\n  <style>\n    body { font-family: system-ui; padding: 16px }\n  </style>\n</head>\n<body>\n  <h1>مرحباً بالنيل</h1>\n  <button onclick="this.textContent=\'تم!\'">اضغطني</button>\n</body>\n</html>','html')},true);
+  if(b.dataset.x==='gl')pgGloss();else playground(null,'html')},true);
 
 /* ===== رقم الإصدار الحقيقي ===== */
 let VER='';
@@ -270,7 +274,7 @@ function onboard(){
   draw();document.body.appendChild(el);
 }
 
-window.NX={toast,esc,addXP,quizHTML,playground};
+window.NX={toast,esc,addXP,quizHTML,playground,doc,chk,saveCh};
 prefs();render();
 if(!S.ob)onboard();
 })();
