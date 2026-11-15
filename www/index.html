@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>مهامي</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #f4f7f7; color: #10282d; min-height: 100dvh; }
+    header { background: #0b7a85; color: #fff; padding: 24px 16px; }
+    header h1 { margin: 0; font-size: 26px; }
+    main { padding: 16px; }
+    input, button { font: inherit; min-height: 48px; border-radius: 12px; }
+    input { border: 1px solid #c9d6d8; padding: 0 12px; }
+    button { border: 0; padding: 0 18px; background: #0b7a85; color: #fff; }
+    ul { list-style: none; padding: 0; }
+    li { background: #fff; margin: 8px 0; padding: 12px; border-radius: 12px; }
+    @media (prefers-color-scheme: dark) {
+      body { background: #0b1d21; color: #e4f1f0; }
+      li, input { background: #14302f; color: #e4f1f0; border-color: #2a4b4f; }
+    }
+    .row { display: flex; gap: 8px; }
+    .row input { flex: 1; min-width: 0; }
+    li { display: flex; align-items: center; gap: 10px; }
+    li span { flex: 1; }
+    li.done span { text-decoration: line-through; opacity: .5; }
+    li button { min-height: 36px; padding: 0 12px; background: #d6604d; }
+    .screen { display: none; }
+    .screen.on { display: block; }
+  </style>
+</head>
+<body>
+  <section id="home" class="screen on">
+    <header><h1>📝 مهامي</h1></header>
+    <main>
+      <p>أول تطبيق أبنيه بنفسي 📝</p>
+    <form id="f" class="row">
+      <input id="task" placeholder="مهمة جديدة" autocomplete="off">
+      <button>إضافة</button>
+    </form>
+    <p id="count"></p>
+    <ul id="list"></ul>
+      <button id="aboutBtn">حول التطبيق</button>
+    </main>
+  </section>
+  <section id="about" class="screen">
+    <header><h1>حول مهامي</h1></header>
+    <main>
+      <p>صنعته في دورة Capacitor Nile.</p>
+      <button id="backBtn">رجوع</button>
+    </main>
+  </section>
+  <script>
+    const input = document.getElementById('task');
+    const list = document.getElementById('list');
+    let tasks = [];
+    try { tasks = JSON.parse(localStorage.getItem('my-tasks')) || []; } catch (e) {}
+    function save() { localStorage.setItem('my-tasks', JSON.stringify(tasks)); }
+
+    function render() {
+      list.innerHTML = '';
+      tasks.forEach((t, i) => {
+        const li = document.createElement('li');
+        li.className = t.done ? 'done' : '';
+        const span = document.createElement('span');
+        span.textContent = t.text;
+        span.onclick = () => { t.done = !t.done; save(); render(); };
+        const del = document.createElement('button');
+        del.textContent = 'حذف';
+        del.onclick = () => { tasks.splice(i, 1); save(); render(); };
+        li.append(span, del);
+        list.appendChild(li);
+      });
+      const d = tasks.filter(t => t.done).length;
+      document.getElementById('count').textContent = d + ' من ' + tasks.length + ' مكتملة';
+    }
+
+    function addTask() {
+      const text = input.value.trim();
+      if (!text) return;
+      tasks.push({ text, done: false });
+      input.value = '';
+      save();
+      render();
+    }
+
+    document.getElementById('f').addEventListener('submit', e => {
+      e.preventDefault();
+      addTask();
+    });
+    render();
+
+    function show(id) {
+      document.querySelectorAll('.screen').forEach(x => x.classList.toggle('on', x.id === id));
+    }
+    document.getElementById('aboutBtn').onclick = () => { history.pushState({ s: 'about' }, ''); show('about'); };
+    document.getElementById('backBtn').onclick = () => history.back();
+    addEventListener('popstate', () => show(history.state && history.state.s || 'home'));
+  </script>
+</body>
+</html>
