@@ -323,6 +323,31 @@ article h3{margin-top:26px;font-size:calc(19px * var(--fz,1))}
 .sbx #gres{grid-column:1/-1}
 .sbx-x{min-height:44px;color:var(--nile);font-weight:700}
 .sbt{inset-inline-start:auto!important;inset-inline-end:16px}
+
+/* ===== الطرفية ===== */
+#term{position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;background:#0c1115;color:#d8e2e6;font:13.5px/1.55 ui-monospace,"JetBrains Mono","Fira Code",Menlo,Consolas,monospace}
+.tbar{display:flex;align-items:center;gap:10px;padding:calc(max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)) + 8px) 10px 8px;background:#111a1f;border-bottom:1px solid #1d2a30;font-family:inherit}
+.tbar b{color:#8fd3c1;font-size:13px}.tsp{flex:1}
+.tbar .tx{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#9fb3ba}
+.thelp{min-height:36px;padding:0 12px;border-radius:10px;background:#1a262c;color:#8fd3c1;font:inherit}
+.tout{flex:1;overflow:auto;padding:10px 12px 4px;text-align:left;white-space:pre-wrap;word-break:break-word;-webkit-user-select:text;user-select:text;overscroll-behavior:contain}
+.tl{min-height:1.55em}.tl.cmd{margin-top:4px}.tl.err{color:#ff8a80}.tl.ok,.tl .ok{color:#7ee2a8}.tl.dim,.tl .dim{color:#6f858d}.tl.hint{color:#ffd877}
+.tl [dir=rtl]{font-family:'Noto Sans Arabic',system-ui,sans-serif;font-size:14px}
+.tp{color:#5fd4ff;font-weight:700}.td{color:#6cb6ff;font-weight:700}.tg{color:#7ee2a8}.tc{color:#ffd877}
+.tbtn{margin:6px 0;min-height:40px;padding:0 14px;border-radius:10px;background:#0b7a85;color:#fff;font-family:'Noto Sans Arabic',system-ui,sans-serif}
+.tin{display:flex;align-items:center;gap:6px;padding:8px 12px;border-top:1px solid #1d2a30;background:#0c1115}
+.tin input{flex:1;min-width:0;min-height:40px;border:0;outline:0;background:none;color:#fff;font:inherit;caret-color:#7ee2a8}
+.tin.q{background:linear-gradient(90deg,rgba(240,168,30,.10),transparent)}.tin.q input{color:#ffd877}
+.tin.busy input{opacity:.4}
+.tkeys{display:grid;grid-template-columns:repeat(6,1fr);background:#111a1f;padding:2px 2px calc(max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)) + 2px)}
+.tkeys button{min-height:42px;color:#d8e2e6;font:600 13px ui-monospace,monospace;border-radius:8px}
+.tkeys button:active,.tkeys button.on{background:#24343b;color:#7ee2a8}
+.nano{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;background:#0c1115}
+.nh{display:flex;justify-content:space-between;gap:8px;padding:calc(max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)) + 8px) 10px 6px;background:#d8e2e6;color:#0c1115;font-size:12px}
+.nano textarea{flex:1;resize:none;border:0;outline:0;padding:10px 12px;background:#0c1115;color:#e8f0f2;font:inherit;line-height:1.6;white-space:pre;tab-size:2}
+.nf{display:flex;gap:6px;padding:6px 6px calc(max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)) + 6px);background:#111a1f}
+.nf button{flex:1;min-height:44px;border-radius:10px;color:#d8e2e6;font:13px ui-monospace,monospace;background:#1a262c}.nf b{background:#d8e2e6;color:#0c1115;padding:0 4px;border-radius:3px;margin-inline-end:4px}
+.cp.trm{margin-inline-start:6px;color:#7ee2a8}
 /* ===== مشروعي ===== */
 .pjcard{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:20px 20px 0;padding:14px 16px;text-align:start;background:var(--sur);border:1px solid var(--line);border-radius:20px}
 .pjcard>span:nth-child(2){flex:1;display:flex;flex-direction:column;line-height:1.5}.pjcard small,.pjadd small{color:var(--mut);font-size:12px}.pjcard em{font-style:normal;font-size:13px;color:var(--nile)}
@@ -669,5 +694,6 @@ prefs();tab(0);render();setTimeout(adsInit,600);
 <script src="quiz.js"></script>
 <script src="features.js"></script>
 <script src="project.js"></script>
+<script src="terminal.js"></script>
 </body>
 </html>

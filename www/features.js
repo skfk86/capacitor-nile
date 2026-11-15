@@ -219,7 +219,7 @@ $('#sets').addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.xg){e.stopImmediatePropagation();S.goal=+b.dataset.xg;sv();settings();return}
   if(b.dataset.rm!=null){e.stopImmediatePropagation();const h=+b.dataset.rm;S.rh=h||S.rh;const ok=await setRemind(!!h);if(ok){S.rem=!!h;sv();toast(h?'سيصلك تذكير يومي':'أُوقف التذكير')}settings();return}
-  if(b.id==='reset'){e.stopImmediatePropagation();if(!confirm('حذف كل التقدّم والإحصائيات؟'))return;done=[];save();Object.assign(S,{copies:0,act:{},xp:0,xd:{},qp:{},ch:{}});CH.forEach((_,k)=>delete S['cd'+k]);sv();prefs();render()}
+  if(b.id==='reset'){e.stopImmediatePropagation();if(!confirm('حذف كل التقدّم والإحصائيات؟'))return;done=[];save();Object.assign(S,{copies:0,act:{},xp:0,xd:{},qp:{},ch:{}});CH.forEach((_,k)=>delete S['cd'+k]);window.NXT&&NXT.reset();sv();prefs();render()}
 },true);
 
 /* ===== القائمة الجانبية ===== */
@@ -238,6 +238,7 @@ pgAbout=function(){_about();if(VER)document.querySelectorAll('#sh .ab p').forEac
 (()=>{const A=AP();if(!A)return;
   A.addListener('backButton',()=>{
     if(document.getElementById('ob'))return;
+    if(window.NXB&&window.NXB())return;
     if(pgo)return close2();
     if(dr.classList.contains('on'))return drawer(false);
     if(document.body.classList.contains('ov'))return history.back();
