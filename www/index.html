@@ -447,6 +447,20 @@ article h3{margin-top:26px;font-size:calc(19px * var(--fz,1))}
 #exam .eb2{background:var(--bg);color:var(--ink)}#exam .eb2:disabled{opacity:.4}
 .xres{margin:auto;padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}.xres h2{font-size:24px}.xres p{color:var(--mut)}.xres.ok svg{color:var(--sun)}.xres.bad svg{color:#d6604d}.xres .go{width:auto;padding:0 32px;margin-top:10px}
 .spn.big{width:44px;height:44px;border-width:4px}
+
+/* ===== السحابة والدوري ===== */
+.lbd{padding:16px;margin-bottom:12px;background:var(--sur);border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh1)}
+.lbh{display:flex;align-items:center;gap:8px;color:var(--nile)}.lbh small{margin-inline-start:auto;color:var(--mut);font-size:12px}
+.lbl ol{list-style:none;padding:0;margin-top:8px}
+.lbl li{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:12px}
+.lbl li.me{background:color-mix(in srgb,var(--sun) 16%,var(--sur))}
+.lbl .rk{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--bg);color:var(--mut)}
+.lbl .r1{background:#f0a81e;color:#3a2600}.lbl .r2{background:#c5ced1;color:#22313a}.lbl .r3{background:#d9a173;color:#3d2410}
+.lbl .av{position:relative;flex:none;width:32px;height:32px;border-radius:50%;background:color-mix(in srgb,var(--nile) 20%,var(--sur));color:var(--nile);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:14px;overflow:hidden}.lbl .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.lbl li b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lbl li em{font-style:normal;font-weight:700;color:var(--nile);font-size:14px}
+.lbme{margin-top:8px;padding:8px 12px;border-radius:12px;background:var(--bg);font-size:14px}
+.clr h3{display:flex;align-items:center;gap:6px}
+.clst{display:flex;align-items:center;gap:10px;margin:8px 0}.clst img{width:36px;height:36px;border-radius:50%}.clst span{flex:1;display:flex;flex-direction:column;line-height:1.4}.clst small{color:var(--mut);font-size:12.5px}.clst .go2{margin:0;flex:none}
 /* ===== مشروعي ===== */
 .pjcard{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:20px 20px 0;padding:14px 16px;text-align:start;background:var(--sur);border:1px solid var(--line);border-radius:20px}
 .pjcard>span:nth-child(2){flex:1;display:flex;flex-direction:column;line-height:1.5}.pjcard small,.pjadd small{color:var(--mut);font-size:12px}.pjcard em{font-style:normal;font-size:13px;color:var(--nile)}
@@ -798,5 +812,6 @@ prefs();tab(0);render();setTimeout(adsInit,600);
 <script src="notify.js"></script>
 <script src="qr.js"></script>
 <script src="cert.js"></script>
+<script src="cloud.js"></script>
 </body>
 </html>
