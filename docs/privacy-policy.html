@@ -36,13 +36,13 @@ footer{text-align:center;color:var(--mut);font-size:14px;padding:0 18px 40px}
   <div class="brand"><i></i>Capacitor Nile</div>
   <h1>سياسة الخصوصية</h1>
   <p>تطبيق Capacitor Nile التعليمي لبناء تطبيقات Android</p>
-  <p class="upd">آخر تحديث: 8 أكتوبر 2026</p>
+  <p class="upd">آخر تحديث: 19 نوفمبر 2026</p>
 </div></header>
 <main>
 <section class="card">
   <h2>الخلاصة</h2>
-  <p>لا يطلب التطبيق حساباً، ويحفظ تقدّمك على جهازك فقط، ولا نرسل بياناتك الشخصية إلى خوادمنا. يعرض التطبيق إعلانات من Google AdMob، ولذلك قد تجمع Google بعض معرّفات الجهاز لعرضها، كما هو موضح في قسم الإعلانات.</p>
-  <div class="chips"><span>بلا حسابات</span><span>تقدّمك على جهازك</span><span>إعلانات AdMob</span><span>خيار الموافقة</span></div>
+  <p>لا يطلب التطبيق حساباً، ويحفظ تقدّمك على جهازك. ميزات السحابة كلها <b>اختيارية</b>: تعمل فقط إذا ربطت حسابك في GitHub بنفسك، وتستطيع إيقافها من الإعدادات. والإعلانات متوقفة حالياً.</p>
+  <div class="chips"><span>بلا حسابات إلزامية</span><span>تقدّمك على جهازك</span><span>سحابة اختيارية</span><span>إحصائيات مجهولة الهوية</span></div>
 </section>
 
 <section class="card">
@@ -52,20 +52,27 @@ footer{text-align:center;color:var(--mut);font-size:14px;padding:0 18px 40px}
     <li>المحطات التي أتممتها في الدروس.</li>
     <li>إحصائيات نشاطك: أيام التعلم، وعدد الأكواد المنسوخة، ودقائق التعلم.</li>
     <li>تفضيلاتك: المظهر وحجم الخط.</li>
-    <li>الاسم الذي تكتبه على شهادة التخرج وتاريخ التخرج، إن اخترت كتابته.</li>
+    <li>الاسم الذي تكتبه على الشهادة، ومشروعك التعليمي، وملفات ملعب الكود والطرفية التدريبية.</li>
+    <li>رمز GitHub إن حفظته في «مشروعي»: يبقى على جهازك ولا يُرسل إلا إلى GitHub وإلى خادمنا للتحقق من هويتك، ولا نخزّنه.</li>
   </ul>
-  <p>لا تصلنا هذه البيانات ولا نستطيع الاطلاع عليها. ولا نحتفظ بها على أي خادم.</p>
 </section>
 
 <section class="card">
-  <h2>الاتصال بالإنترنت</h2>
-  <p>عند فتح التطبيق وأنت متصل بالإنترنت، يطلب خط الكتابة من خدمة <b>Google Fonts</b>. وكأي طلب ويب، قد تستقبل Google عنوان IP ونوع الجهاز لتقديم الخط، وذلك وفق <a href="https://policies.google.com/privacy" rel="noopener">سياسة خصوصية Google</a>. لا يرسل التطبيق بياناتك الشخصية إلى خوادمنا. ويتصل أيضاً بخوادم Google AdMob لتحميل الإعلانات.</p>
-  <p>يعمل التطبيق دون إنترنت بخط النظام عند تعذّر تحميل الخط.</p>
+  <h2>الاتصال بالإنترنت والخدمات السحابية</h2>
+  <p>يعمل التطبيق بلا إنترنت بخط النظام. ويتصل بالإنترنت في الحالات التالية فقط:</p>
+  <ul>
+    <li><b>GitHub</b> (عند ربط حسابك): لإنشاء مستودع مشروعك وبناء تطبيقك، وفق <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">سياسة خصوصية GitHub</a>.</li>
+    <li><b>الحفظ السحابي</b> (عند ربط حسابك): نحفظ على خادمنا اسم حسابك في GitHub وتقدّمك في الدروس ونقاطك وإعداداتك، لتستعيدها على أي هاتف.</li>
+    <li><b>دوري الأسبوع</b> (يمكنك إيقافه): يظهر للمشاركين اسمك وصورة حسابك في GitHub ونقاط الأسبوع.</li>
+    <li><b>الشهادة الموثّقة</b>: نحفظ اسمك واسم حسابك ونتيجة الاختبار ورابط مشروعك، وتظهر هذه البيانات لمن يفتح صفحة التحقق برقم شهادتك.</li>
+    <li><b>إحصائيات مجهولة الهوية</b> (يمكنك إيقافها): نرسل أحداثاً مثل «فُتحت المحطة 5» أو «أُجيب سؤال خطأ» مع معرّف عشوائي للجهاز، بلا اسم أو حساب أو موقع، لنعرف أين نحسّن الدروس.</li>
+  </ul>
+  <p>تُستضاف هذه البيانات على Supabase (الاتحاد الأوروبي). لا نبيعها ولا نشاركها مع أي جهة أخرى.</p>
 </section>
 
 <section class="card">
   <h2>الأذونات</h2>
-  <p>يستخدم التطبيق إذن الإنترنت، وإذن معرّف الإعلانات (Advertising ID) الذي تطلبه مكتبة الإعلانات. ولا يطلب الكاميرا أو الميكروفون أو الموقع أو جهات الاتصال أو الرسائل أو ملفات الجهاز.</p>
+  <p>يستخدم التطبيق إذن الإنترنت، وإذن الإشعارات إن فعّلت التذكير اليومي، وإذن معرّف الإعلانات (Advertising ID) الذي تطلبه مكتبة الإعلانات. ولا يطلب الكاميرا أو الميكروفون أو الموقع أو جهات الاتصال أو الرسائل أو ملفات الجهاز.</p>
 </section>
 
 <section class="card">
@@ -103,7 +110,7 @@ footer{text-align:center;color:var(--mut);font-size:14px;padding:0 18px 40px}
   <ul>
     <li>من داخل التطبيق: الإعدادات ثم «إعادة ضبط التقدّم».</li>
     <li>من النظام: إعدادات أندرويد ثم التطبيقات ثم Capacitor Nile ثم التخزين ثم مسح البيانات.</li>
-    <li>أو احذف التطبيق، فتُحذف بياناته معه.</li>
+    <li>لحذف نسختك السحابية أو بياناتك في الدوري أو شهادتك: افتح طلباً في <a href="https://github.com/skfk86/capacitor-nile/issues" rel="noopener">صفحة المشروع</a> من حسابك في GitHub، ونحذفها خلال 30 يوماً.</li>
   </ul>
 </section>
 
@@ -119,16 +126,16 @@ footer{text-align:center;color:var(--mut);font-size:14px;padding:0 18px 40px}
 
 <section class="card en" lang="en" dir="ltr">
   <h2>Privacy Policy (English summary)</h2>
-  <p><b>Capacitor Nile</b> is an educational app for building Android apps. Last updated: 8 October 2026.</p>
+  <p><b>Capacitor Nile</b> is an educational app for building Android apps. Last updated: 19 November 2026.</p>
   <ul>
-    <li><b>No accounts.</b> We do not collect personal data and we run no servers that receive your data. The app shows ads through <b>Google AdMob</b> (see below).</li>
-    <li><b>Stored on your device only:</b> lesson progress, activity statistics, display preferences, and the optional name you type for the graduation certificate.</li>
-    <li><b>Network:</b> on launch the app may request its font from Google Fonts, so Google may receive your IP address and device type under its own privacy policy. The app works offline with a system font.</li>
+    <li><b>No mandatory accounts.</b> Progress is stored on your device. Cloud features are optional and only work if you link your GitHub account; ads are currently disabled.</li>
+    <li><b>On your device:</b> lesson progress, statistics, preferences, your certificate name, your learning project and playground files, and your GitHub token if you save it (sent only to GitHub and to our server to verify your identity, never stored by us).</li>
+    <li><b>Optional cloud (Supabase, EU):</b> cloud backup of your progress keyed to your GitHub username; a weekly leaderboard showing your name, GitHub avatar and weekly points (can be turned off); verified certificates (name, GitHub username, score, project link) visible on the public verification page; and anonymous usage events with a random device ID and no name or account (can be turned off). We do not sell or share this data.</li>
     <li><b>Ads (Google AdMob):</b> to show and measure ads and prevent fraud, the Google ads SDK automatically collects, for advertising, analytics and fraud prevention: IP address (which may be used to estimate a general location), product interactions such as app launches, taps and video views, diagnostic information about app performance, and device identifiers such as the Advertising ID and App Set ID. Data is encrypted in transit (TLS). In regions that require consent (for example the EEA and UK), a consent message from Google appears; you can change your choice in Settings, Privacy options, where available. You can also reset your Advertising ID or opt out of ad personalization in Android settings. See <a href="https://policies.google.com/technologies/ads" rel="noopener">how Google uses data in ads</a>.</li>
-    <li><b>Permissions:</b> internet and the Advertising ID permission. No camera, microphone, location, contacts, or file access.</li>
-    <li><b>Sharing:</b> we do not sell or share your data; the only data flow is the ad SDK described above. Sharing the certificate is your choice through Android's share sheet. The copy button only writes to the clipboard when tapped; the app never reads it.</li>
+    <li><b>Permissions:</b> internet, notifications (only if you enable reminders), and the Advertising ID permission. No camera, microphone, location, contacts, or file access.</li>
+    <li><b>Sharing:</b> we do not sell or share your data. Sharing the certificate is your choice through Android's share sheet. The copy button only writes to the clipboard when tapped; the app never reads it.</li>
     <li><b>Children:</b> not directed to children under 13, and we do not request child-directed ads.</li>
-    <li><b>Deleting data:</b> Settings, then Reset progress; or clear app data in Android settings; or uninstall the app.</li>
+    <li><b>Deleting data:</b> Settings, then Reset progress; or clear app data in Android settings. To delete your cloud backup, leaderboard entry or certificate, open an issue from your GitHub account and we will delete it within 30 days.</li>
     <li><b>Contact:</b> <a href="https://github.com/skfk86/capacitor-nile/issues" rel="noopener">github.com/skfk86/capacitor-nile/issues</a></li>
   </ul>
 </section>

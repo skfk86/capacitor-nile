@@ -164,13 +164,14 @@ $('#lv').addEventListener('click',e=>{
   if(o){e.stopImmediatePropagation();const qq=o.closest('.qq'),k=+qq.dataset.k,q=Q[cur][k];
     if(o.closest('.qz.ok')||qs.ok[k])return;
     const r=+o.dataset.o===q[2];o.classList.add(r?'r':'w');
+    if(!qs.miss[k]&&!qs.ok[k])document.dispatchEvent(new CustomEvent('nx:quiz',{detail:{l:cur,q:k,ok:r}}));
     if(r){qs.ok[k]=1;lockGo();qq.querySelectorAll('.qo').forEach(b=>b.disabled=true);if(!qs.miss[k])addXP(5,'إجابة صحيحة')}
     else{qs.miss[k]=1;navigator.vibrate&&navigator.vibrate(40)}
     if(Q[cur].every((_,j)=>qs.ok[j])){S.qp[cur]=1;sv();o.closest('.qz').classList.add('ok');lockGo();const g=$('#lv .go');if(g)g.innerHTML='أتممت المحطة وانتقل للتالية';toast('ممتاز! فُتحت المحطة التالية')}
     return}
   const g=e.target.closest('.go');
   if(g){if(g.classList.contains('lk')){e.stopImmediatePropagation();toast('أجب عن أسئلة الاختبار أولاً');const z=$('#lv .qz');z&&z.scrollIntoView({behavior:'smooth',block:'start'});return}
-    if(!done.includes(cur))addXP(10,'محطة مكتملة')}
+    if(!done.includes(cur)){addXP(10,'محطة مكتملة');document.dispatchEvent(new CustomEvent('nx:done',{detail:{l:cur}}))}}
 },true);
 
 const _home=home;
